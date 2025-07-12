@@ -95,6 +95,26 @@ header {
   }
 }
 
+footer {
+  background-color: $tertiary-color;
+  h2 {
+    font-size: 1.5em;
+  }
+  ul {
+    li {
+      margin-bottom: 10px;
+      a {
+        color: $primary-white;
+        font-size: 1.2em;
+      }
+    }
+  }
+  .spotlight {
+    border-top: 1px solid rgba($primary-white, 0.1);
+    border-bottom: 1px solid rgba($primary-white, 0.1);
+  }
+}
+
 .section-1 {
   .swiper {
     .swiper-wrapper {
