@@ -19,10 +19,10 @@ const Footer = () => {
                 <a href="">Kids</a>
               </li>
               <li>
-                <a href="">Women</a>
+                <a href="">Men</a>
               </li>
               <li>
-                <a href="">Men</a>
+                <a href="">Women</a>
               </li>
             </ul>
           </div>

@@ -10,7 +10,7 @@ const Header = () => {
       </div>
       <div className="container">
         <Navbar expand="lg" className="">
-          <Navbar.Brand href="#">
+          <Navbar.Brand href="/">
             <img src={Logo} alt="" width={170} />
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="navbarScroll" />
