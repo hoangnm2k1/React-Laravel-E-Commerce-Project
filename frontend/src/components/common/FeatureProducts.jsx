@@ -1,5 +1,5 @@
 import React from "react";
-import ProductImg from "../../assets/images/mens/eleven.jpg";
+import ProductImg from "../../assets/images/men/eleven.jpg";
 
 const FeatureProducts = () => {
   return (

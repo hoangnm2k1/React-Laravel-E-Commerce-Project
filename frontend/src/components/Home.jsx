@@ -1,9 +1,9 @@
 import React from "react";
 import "swiper/css";
-import LatestProducts from "./LatestProducts";
-import FeatureProducts from "./FeatureProducts";
-import Hero from "./Hero";
-import Layout from "./Layout";
+import LatestProducts from "./common/LatestProducts";
+import FeatureProducts from "./common/FeatureProducts";
+import Hero from "./common/Hero";
+import Layout from "./common/Layout";
 
 const Home = () => {
   return (

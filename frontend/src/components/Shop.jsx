@@ -1,6 +1,7 @@
 import React from "react";
-import Layout from "./Layout";
-import ProductImg from "../../assets/images/mens/eight.jpg";
+import Layout from "./common/Layout";
+import ProductImg from "../assets/images/men/eight.jpg";
+import { Link } from "react-router-dom";
 
 const Shop = () => {
   return (
@@ -10,7 +11,7 @@ const Shop = () => {
           <nav aria-label="breadcrumb" className="py-4">
             <ol className="breadcrumb">
               <li className="breadcrumb-item">
-                <a href="#">Home</a>
+                <Link to="/">Home</Link>
               </li>
               <li className="breadcrumb-item active" aria-current="page">
                 Shop
@@ -81,10 +82,12 @@ const Shop = () => {
                 <div className="col-md-4 col-6">
                   <div className="product card border-0">
                     <div className="card-img">
-                      <img src={ProductImg} alt="" className="w-100" />
+                      <Link to="/product">
+                        <img src={ProductImg} alt="" className="w-100" />
+                      </Link>
                     </div>
                     <div className="card-body pt-3">
-                      <a href="">Red Check Shirt for Men</a>
+                      <Link to="/product">Red Check Shirt for Men</Link>
                       <div className="price">
                         $50{" "}
                         <span className="text-decoration-line-through">
@@ -98,10 +101,12 @@ const Shop = () => {
                 <div className="col-md-4 col-6">
                   <div className="product card border-0">
                     <div className="card-img">
-                      <img src={ProductImg} alt="" className="w-100" />
+                      <Link to="/product">
+                        <img src={ProductImg} alt="" className="w-100" />
+                      </Link>
                     </div>
                     <div className="card-body pt-3">
-                      <a href="">Red Check Shirt for Men</a>
+                      <Link to="/product">Red Check Shirt for Men</Link>
                       <div className="price">
                         $50{" "}
                         <span className="text-decoration-line-through">
@@ -115,10 +120,30 @@ const Shop = () => {
                 <div className="col-md-4 col-6">
                   <div className="product card border-0">
                     <div className="card-img">
-                      <img src={ProductImg} alt="" className="w-100" />
+                      <Link to="/product">
+                        <img src={ProductImg} alt="" className="w-100" />
+                      </Link>
                     </div>
                     <div className="card-body pt-3">
-                      <a href="">Red Check Shirt for Men</a>
+                      <Link to="/product">Red Check Shirt for Men</Link>
+                      <div className="price">
+                        $50{" "}
+                        <span className="text-decoration-line-through">
+                          $80
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="col-md-4 col-6">
+                  <div className="product card border-0">
+                    <div className="card-img">
+                      <Link to="/product">
+                        <img src={ProductImg} alt="" className="w-100" />
+                      </Link>
+                    </div>
+                    <div className="card-body pt-3">
+                      <Link to="/product">Red Check Shirt for Men</Link>
                       <div className="price">
                         $50{" "}
                         <span className="text-decoration-line-through">
@@ -132,10 +157,12 @@ const Shop = () => {
                 <div className="col-md-4 col-6">
                   <div className="product card border-0">
                     <div className="card-img">
-                      <img src={ProductImg} alt="" className="w-100" />
+                      <Link to="/product">
+                        <img src={ProductImg} alt="" className="w-100" />
+                      </Link>
                     </div>
                     <div className="card-body pt-3">
-                      <a href="">Red Check Shirt for Men</a>
+                      <Link to="/product">Red Check Shirt for Men</Link>
                       <div className="price">
                         $50{" "}
                         <span className="text-decoration-line-through">
@@ -149,10 +176,12 @@ const Shop = () => {
                 <div className="col-md-4 col-6">
                   <div className="product card border-0">
                     <div className="card-img">
-                      <img src={ProductImg} alt="" className="w-100" />
+                      <Link to="/product">
+                        <img src={ProductImg} alt="" className="w-100" />
+                      </Link>
                     </div>
                     <div className="card-body pt-3">
-                      <a href="">Red Check Shirt for Men</a>
+                      <Link to="/product">Red Check Shirt for Men</Link>
                       <div className="price">
                         $50{" "}
                         <span className="text-decoration-line-through">
@@ -166,10 +195,12 @@ const Shop = () => {
                 <div className="col-md-4 col-6">
                   <div className="product card border-0">
                     <div className="card-img">
-                      <img src={ProductImg} alt="" className="w-100" />
+                      <Link to="/product">
+                        <img src={ProductImg} alt="" className="w-100" />
+                      </Link>
                     </div>
                     <div className="card-body pt-3">
-                      <a href="">Red Check Shirt for Men</a>
+                      <Link to="/product">Red Check Shirt for Men</Link>
                       <div className="price">
                         $50{" "}
                         <span className="text-decoration-line-through">
@@ -183,10 +214,12 @@ const Shop = () => {
                 <div className="col-md-4 col-6">
                   <div className="product card border-0">
                     <div className="card-img">
-                      <img src={ProductImg} alt="" className="w-100" />
+                      <Link to="/product">
+                        <img src={ProductImg} alt="" className="w-100" />
+                      </Link>
                     </div>
                     <div className="card-body pt-3">
-                      <a href="">Red Check Shirt for Men</a>
+                      <Link to="/product">Red Check Shirt for Men</Link>
                       <div className="price">
                         $50{" "}
                         <span className="text-decoration-line-through">
@@ -200,27 +233,12 @@ const Shop = () => {
                 <div className="col-md-4 col-6">
                   <div className="product card border-0">
                     <div className="card-img">
-                      <img src={ProductImg} alt="" className="w-100" />
+                      <Link to="/product">
+                        <img src={ProductImg} alt="" className="w-100" />
+                      </Link>
                     </div>
                     <div className="card-body pt-3">
-                      <a href="">Red Check Shirt for Men</a>
-                      <div className="price">
-                        $50{" "}
-                        <span className="text-decoration-line-through">
-                          $80
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="col-md-4 col-6">
-                  <div className="product card border-0">
-                    <div className="card-img">
-                      <img src={ProductImg} alt="" className="w-100" />
-                    </div>
-                    <div className="card-body pt-3">
-                      <a href="">Red Check Shirt for Men</a>
+                      <Link to="/product">Red Check Shirt for Men</Link>
                       <div className="price">
                         $50{" "}
                         <span className="text-decoration-line-through">
