@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\admin\AuthController;
+use App\Http\Controllers\admin\BrandController;
 use App\Http\Controllers\admin\CategoryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -19,5 +20,5 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     // Route::delete('categories/{id}', [CategoryController::class, 'destroy']);
 
     Route::resource('categories', CategoryController::class);
-    Route::resource('brands', CategoryController::class);
+    Route::resource('brands', BrandController::class);
 });
