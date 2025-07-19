@@ -12,15 +12,15 @@ class AuthController extends Controller
 {
     public function authenticate(Request $request)
     {
-        $validatetor = Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), [
             'email' => 'required|email',
             'password' => 'required',
         ]);
 
-        if ($validatetor->fails()) {
+        if ($validator->fails()) {
             return response()->json([
                 'status' => 400,
-                'error' => $validatetor->errors(),
+                'error' => $validator->errors(),
             ], 400);
         }
 
