@@ -203,6 +203,14 @@ footer {
   }
 }
 
+.login-page {
+  .login {
+    width: 450px;
+  }
+  padding-top: 100px;
+  padding-bottom: 100px;
+}
+
 @media (min-width: 200px) and (max-width: 768px) {
   .section-1 {
     .swiper {
