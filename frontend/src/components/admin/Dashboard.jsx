@@ -9,10 +9,6 @@ const Dashboard = () => {
   const { logout } = useContext(AdminAuthContext);
   return (
     <Layout>
-      {/* <h1>Dashboard</h1>
-      <button className="btn btn-danger" onClick={logout}>
-        Logout
-      </button> */}
       <div className="container">
         <div className="row">
           <div className="d-flex justify-content-between mt-5 pb-3">
