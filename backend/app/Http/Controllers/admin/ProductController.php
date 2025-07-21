@@ -14,7 +14,11 @@ class ProductController extends Controller
      */
     public function index()
     {
-        //
+        $products = Product::with('category', 'brand')->orderBy('created_at', 'DESC')->get();
+        return response()->json([
+            'status' => 200,
+            'data' => $products,
+        ], 200);
     }
 
     /**
