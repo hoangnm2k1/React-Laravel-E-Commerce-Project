@@ -1,22 +1,20 @@
 import React from "react";
 import Layout from "../../common/Layout";
-import Sidebar from "../../common/Sidebar";
-import Sample from "../../Sample";
 import { Link } from "react-router-dom";
-import { adminToken, apiUrl } from "../../common/Http";
-import { use } from "react";
+import Sidebar from "../../common/Sidebar";
 import { useEffect } from "react";
 import { useState } from "react";
+import { adminToken, apiUrl } from "../../common/Http";
+import { toast } from "react-toastify";
 import Loader from "../../common/Loader";
 import NoState from "../../common/NoState";
-import { toast } from "react-toastify";
 
 const Show = () => {
-  const [categories, setCategories] = useState([]);
+  const [brands, setBrands] = useState([]);
   const [loader, setLoader] = useState(false);
-  const fetchCategories = async () => {
+  const fetchBrands = async () => {
     setLoader(true);
-    const res = await fetch(`${apiUrl}/categories`, {
+    const res = await fetch(`${apiUrl}/brands`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -28,16 +26,16 @@ const Show = () => {
       .then((result) => {
         setLoader(false);
         if (result.status == 200) {
-          setCategories(result.data);
+          setBrands(result.data);
         } else {
-          console.error("Failed to fetch categories:", result.message);
+          console.error("Failed to fetch brands:", result.message);
         }
       });
   };
 
-  const deleteCategory = async (id) => {
-    if (confirm("Are you sure you want to delete this category?")) {
-      const res = await fetch(`${apiUrl}/categories/${id}`, {
+  const deleteBrand = async (id) => {
+    if (confirm("Are you sure you want to delete this brand?")) {
+      const res = await fetch(`${apiUrl}/brands/${id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -48,29 +46,26 @@ const Show = () => {
         .then((res) => res.json())
         .then((result) => {
           if (result.status == 200) {
-            const newCategories = categories.filter(
-              (category) => category.id != id
-            );
-            setCategories(newCategories);
+            const newBrands = brands.filter((brand) => brand.id != id);
+            setBrands(newBrands);
             toast.success(result.message);
           } else {
-            toast.error("Failed to delete category");
+            toast.error("Failed to delete brand");
           }
         });
     }
   };
 
   useEffect(() => {
-    fetchCategories();
+    fetchBrands();
   }, []);
-
   return (
     <Layout>
       <div className="container">
         <div className="row">
           <div className="d-flex justify-content-between mt-5 pb-3">
-            <h4 className="h4 pb-0 mb-0">Categories</h4>
-            <Link to="/admin/categories/create" className="btn btn-primary">
+            <h4 className="h4 pb-0 mb-0">Brands</h4>
+            <Link to="/admin/brands/create" className="btn btn-primary">
               Create
             </Link>
           </div>
@@ -81,10 +76,10 @@ const Show = () => {
             <div className="card shadow">
               <div className="card-body p-4">
                 {loader && <Loader />}
-                {loader == false && categories.length == 0 && (
-                  <NoState text="Categories Not Found" />
+                {loader == false && brands.length == 0 && (
+                  <NoState text="Brands Not Found" />
                 )}
-                {categories && categories.length > 0 && (
+                {brands && brands.length > 0 && (
                   <table className="table table-hover">
                     <thead>
                       <tr>
@@ -95,13 +90,13 @@ const Show = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {categories.map((category) => {
+                      {brands.map((brand) => {
                         return (
-                          <tr key={`category-${category.id}`}>
-                            <td>{category.id}</td>
-                            <td>{category.name}</td>
+                          <tr key={`brand-${brand.id}`}>
+                            <td>{brand.id}</td>
+                            <td>{brand.name}</td>
                             <td>
-                              {category.status == 1 ? (
+                              {brand.status == 1 ? (
                                 <span className="badge text-bg-success">
                                   Active
                                 </span>
@@ -113,7 +108,7 @@ const Show = () => {
                             </td>
                             <td>
                               <Link
-                                to={`/admin/categories/edit/${category.id}`}
+                                to={`/admin/brands/edit/${brand.id}`}
                                 className="text-primary"
                               >
                                 <svg
@@ -131,7 +126,7 @@ const Show = () => {
                               <Link
                                 to=""
                                 className="text-danger ms-2"
-                                onClick={() => deleteCategory(category.id)}
+                                onClick={() => deleteBrand(brand.id)}
                               >
                                 <svg
                                   xmlns="http://www.w3.org/2000/svg"

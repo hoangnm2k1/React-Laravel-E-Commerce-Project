@@ -13,6 +13,9 @@ import { AdminAuthProvider } from "./components/context/AdminAuth";
 import { default as ShowCategories } from "./components/admin/category/Show";
 import { default as CreateCategories } from "./components/admin/category/Create";
 import { default as EditCategories } from "./components/admin/category/Edit";
+import { default as ShowBrands } from "./components/admin/brand/Show";
+import { default as CreateBrands } from "./components/admin/brand/Create";
+import { default as Editbrands } from "./components/admin/brand/Edit";
 
 function App() {
   return (
@@ -33,6 +36,7 @@ function App() {
               </AdminAuthProvider>
             }
           />
+
           <Route
             path="/admin/dashboard"
             element={
@@ -43,6 +47,7 @@ function App() {
               </AdminAuthProvider>
             }
           />
+
           <Route
             path="/admin/categories"
             element={
@@ -53,6 +58,7 @@ function App() {
               </AdminAuthProvider>
             }
           />
+
           <Route
             path="/admin/categories/create"
             element={
@@ -63,12 +69,46 @@ function App() {
               </AdminAuthProvider>
             }
           />
+
           <Route
             path="/admin/categories/edit/:id"
             element={
               <AdminAuthProvider>
                 <AdminRequireAuth>
                   <EditCategories />
+                </AdminRequireAuth>
+              </AdminAuthProvider>
+            }
+          />
+
+          <Route
+            path="/admin/brands"
+            element={
+              <AdminAuthProvider>
+                <AdminRequireAuth>
+                  <ShowBrands />
+                </AdminRequireAuth>
+              </AdminAuthProvider>
+            }
+          />
+
+          <Route
+            path="/admin/brands/create"
+            element={
+              <AdminAuthProvider>
+                <AdminRequireAuth>
+                  <CreateBrands />
+                </AdminRequireAuth>
+              </AdminAuthProvider>
+            }
+          />
+
+          <Route
+            path="/admin/brands/edit/:id"
+            element={
+              <AdminAuthProvider>
+                <AdminRequireAuth>
+                  <Editbrands />
                 </AdminRequireAuth>
               </AdminAuthProvider>
             }
