@@ -22,6 +22,17 @@ class Product extends Model
         'is_featured'
     ];
 
+    protected $appends = ['image_url'];
+
+    public function getImageUrlAttribute()
+    {
+        if ($this->image == "") {
+            return "";
+        }
+
+        return asset('uploads/products/small/' . $this->image);
+    }
+
     public function category()
     {
         return $this->belongsTo(Category::class);
@@ -41,4 +52,5 @@ class Product extends Model
     {
         return $this->hasMany(ProductSize::class);
     }
+
 }

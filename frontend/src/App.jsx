@@ -10,12 +10,18 @@ import { ToastContainer, toast } from "react-toastify";
 import Dashboard from "./components/admin/Dashboard";
 import { AdminRequireAuth } from "./components/admin/AdminRequireAuth";
 import { AdminAuthProvider } from "./components/context/AdminAuth";
+
 import { default as ShowCategories } from "./components/admin/category/Show";
-import { default as CreateCategories } from "./components/admin/category/Create";
-import { default as EditCategories } from "./components/admin/category/Edit";
+import { default as CreateCategory } from "./components/admin/category/Create";
+import { default as EditCategory } from "./components/admin/category/Edit";
+
 import { default as ShowBrands } from "./components/admin/brand/Show";
-import { default as CreateBrands } from "./components/admin/brand/Create";
-import { default as Editbrands } from "./components/admin/brand/Edit";
+import { default as CreateBrand } from "./components/admin/brand/Create";
+import { default as EditBrand } from "./components/admin/brand/Edit";
+
+import { default as ShowProducts } from "./components/admin/product/Show";
+import { default as CreateProduct } from "./components/admin/product/Create";
+import { default as EditProduct } from "./components/admin/product/Edit";
 
 function App() {
   return (
@@ -64,7 +70,7 @@ function App() {
             element={
               <AdminAuthProvider>
                 <AdminRequireAuth>
-                  <CreateCategories />
+                  <CreateCategory />
                 </AdminRequireAuth>
               </AdminAuthProvider>
             }
@@ -75,7 +81,7 @@ function App() {
             element={
               <AdminAuthProvider>
                 <AdminRequireAuth>
-                  <EditCategories />
+                  <EditCategory />
                 </AdminRequireAuth>
               </AdminAuthProvider>
             }
@@ -97,7 +103,7 @@ function App() {
             element={
               <AdminAuthProvider>
                 <AdminRequireAuth>
-                  <CreateBrands />
+                  <CreateBrand />
                 </AdminRequireAuth>
               </AdminAuthProvider>
             }
@@ -108,7 +114,40 @@ function App() {
             element={
               <AdminAuthProvider>
                 <AdminRequireAuth>
-                  <Editbrands />
+                  <EditBrand />
+                </AdminRequireAuth>
+              </AdminAuthProvider>
+            }
+          />
+
+          <Route
+            path="/admin/products/"
+            element={
+              <AdminAuthProvider>
+                <AdminRequireAuth>
+                  <ShowProducts />
+                </AdminRequireAuth>
+              </AdminAuthProvider>
+            }
+          />
+
+          <Route
+            path="/admin/products/create"
+            element={
+              <AdminAuthProvider>
+                <AdminRequireAuth>
+                  <CreateProduct />
+                </AdminRequireAuth>
+              </AdminAuthProvider>
+            }
+          />
+
+          <Route
+            path="/admin/products/edit/:id"
+            element={
+              <AdminAuthProvider>
+                <AdminRequireAuth>
+                  <EditProduct />
                 </AdminRequireAuth>
               </AdminAuthProvider>
             }

@@ -28,9 +28,9 @@ class TempImageController extends Controller
         $imageName = time() . '.' . $image->extension();
         $image->move(public_path('uploads/temp'), $imageName);
 
-        $tempImage = new TempImage();
-        $tempImage->name = $imageName;
-        $tempImage->save();
+        $tempImage = TempImage::create([
+            'name' => $imageName
+        ]);
 
         $manager = new ImageManager(Driver::class);
         $img = $manager->read(public_path('uploads/temp/' . $imageName));
