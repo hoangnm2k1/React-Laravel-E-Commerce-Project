@@ -37,7 +37,7 @@ class ProductController extends Controller
         $validator = Validator::make($request->all(), [
             'title' => 'required',
             'price' => 'required|numeric',
-            'category' => 'required|integer',
+            'category_id' => 'required|integer',
             'sku' => 'required|unique:products,sku',
             'status' => 'required',
             'is_featured' => 'required',
@@ -50,21 +50,7 @@ class ProductController extends Controller
             ], 400);
         }
 
-        $product = Product::create([
-            'title' => $request->title,
-            'price' => $request->price,
-            'compare_price' => $request->compare_price,
-            'description' => $request->description,
-            'short_description' => $request->short_description,
-            'image' => $request->image,
-            'category_id' => $request->category,
-            'brand_id' => $request->brand,
-            'quantity' => $request->quantity,
-            'sku' => $request->sku,
-            'barcode' => $request->barcode,
-            'status' => $request->status,
-            'is_featured' => $request->is_featured,
-        ]);
+        $product = Product::create($request->all());
 
         return response()->json([
             'status' => 200,
@@ -78,7 +64,20 @@ class ProductController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $product = Product::find($id);
+
+        if (!$product) {
+            return response()->json([
+                'status' => 404,
+                'message' => 'Product not found',
+                'data' => []
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => 200,
+            'data' => $product
+        ], 200);
     }
 
     /**
@@ -94,7 +93,38 @@ class ProductController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $product = Product::find($id);
+
+        if (!$product) {
+            return response()->json([
+                'status' => 404,
+                'message' => 'Product not found',
+            ], 404);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'title' => 'required',
+            'price' => 'required|numeric',
+            'category_id' => 'required|integer',
+            'sku' => 'required|unique:products,sku,' . $id,
+            'status' => 'required',
+            'is_featured' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 400,
+                'errors' => $validator->errors()
+            ], 400);
+        }
+
+        $product->update($request->all());
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Product updated successfully',
+            'data' => $product
+        ]);
     }
 
     /**
@@ -102,6 +132,20 @@ class ProductController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $product = Product::find($id);
+
+        if (!$product) {
+            return response()->json([
+                'status' => 404,
+                'message' => 'Product not found',
+            ], 404);
+        }
+
+        $product->delete();
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Product deleted successfully'
+        ], 200);
     }
 }
