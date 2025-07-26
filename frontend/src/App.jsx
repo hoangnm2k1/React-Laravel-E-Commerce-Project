@@ -136,7 +136,7 @@ function App() {
             element={
               <AdminAuthProvider>
                 <AdminRequireAuth>
-                  <CreateProduct />
+                  <CreateProduct placeholder="" />
                 </AdminRequireAuth>
               </AdminAuthProvider>
             }

@@ -3,7 +3,7 @@ import Layout from "../../common/Layout";
 import { Link, useNavigate } from "react-router-dom";
 import Sidebar from "../../common/Sidebar";
 import { useState, useRef, useMemo } from "react";
-import { useForm } from "react-hook-form";
+import { set, useForm } from "react-hook-form";
 import { adminToken, apiUrl } from "../../common/Http";
 import { toast } from "react-toastify";
 import { useEffect } from "react";
@@ -15,8 +15,12 @@ const Create = ({ placeholder }) => {
   const [content, setContent] = useState("");
   const [disable, setDisable] = useState(false);
   const [categories, setCategories] = useState([]);
+  const [gallery, setGallery] = useState([]);
+  const [galleryImages, setGalleryImages] = useState([]);
+
   const [brands, setBrands] = useState([]);
   const navigate = useNavigate();
+
   const config = useMemo(
     () => ({
       readonly: false,
@@ -28,10 +32,13 @@ const Create = ({ placeholder }) => {
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors },
   } = useForm();
 
   const saveProduct = async (data) => {
+    console.log(data);
+    const formData = { ...data, description: content, gallery: gallery };
     setDisable(true);
     const res = await fetch(`${apiUrl}/products`, {
       method: "POST",
@@ -40,7 +47,7 @@ const Create = ({ placeholder }) => {
         Accept: "application/json",
         Authorization: `Bearer ${adminToken()}`,
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify(formData),
     })
       .then((res) => res.json())
       .then((result) => {
@@ -49,7 +56,10 @@ const Create = ({ placeholder }) => {
           toast.success(result.message);
           navigate("/admin/products");
         } else {
-          toast.error("Failed to create product");
+          // toast.error("Failed to create product");
+          Object.keys(result.errors).forEach((key) => {
+            setError(key, { message: result.errors[key][0] });
+          });
         }
       });
   };
@@ -90,6 +100,37 @@ const Create = ({ placeholder }) => {
           console.error("Failed to fetch brands");
         }
       });
+  };
+
+  const handleFile = async (e) => {
+    const formData = new FormData();
+    const file = e.target.files[0];
+    formData.append("image", file);
+    setDisable(true);
+
+    const res = await fetch(`${apiUrl}/temp-images`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${adminToken()}`,
+      },
+      body: formData,
+    })
+      .then((res) => res.json())
+      .then((result) => {
+        console.log(result);
+        gallery.push(result.data.id);
+        setGallery(gallery);
+        galleryImages.push(result.data.image_url);
+        setGalleryImages(galleryImages);
+        setDisable(false);
+        e.target.value = "";
+      });
+  };
+
+  const deleteImage = (image) => {
+    const newGallery = galleryImages.filter((img) => img !== image);
+    setGalleryImages(newGallery);
   };
 
   useEffect(() => {
@@ -172,7 +213,10 @@ const Create = ({ placeholder }) => {
                         <label htmlFor="" className="form-label">
                           Brand
                         </label>
-                        <select name="" id="" className="form-control">
+                        <select
+                          {...register("brand_id")}
+                          className="form-control"
+                        >
                           <option value="">Select a brand</option>
                           {brands &&
                             brands.map((brand) => (
@@ -200,8 +244,8 @@ const Create = ({ placeholder }) => {
                         errors.is_featured && "is-invalid"
                       }`}
                     >
-                      <option value="1">Yes</option>
-                      <option value="0">No</option>
+                      <option value="yes">Yes</option>
+                      <option value="no">No</option>
                     </select>
                     {errors.is_featured && (
                       <p className="invalid-feedback">
@@ -215,8 +259,7 @@ const Create = ({ placeholder }) => {
                       Short Description
                     </label>
                     <textarea
-                      name=""
-                      id=""
+                      {...register("short_description")}
                       rows={3}
                       className="form-control"
                       placeholder="Short Description"
@@ -266,6 +309,7 @@ const Create = ({ placeholder }) => {
                           Discounted Price
                         </label>
                         <input
+                          {...register("compare_price")}
                           type="text"
                           className="form-control"
                           placeholder="Discounted Price"
@@ -305,6 +349,7 @@ const Create = ({ placeholder }) => {
                           Barcode
                         </label>
                         <input
+                          {...register("barcode")}
                           type="text"
                           className="form-control"
                           placeholder="Barcode"
@@ -320,6 +365,7 @@ const Create = ({ placeholder }) => {
                           Quantity
                         </label>
                         <input
+                          {...register("quantity")}
                           type="text"
                           className="form-control"
                           placeholder="Quantity"
@@ -358,7 +404,30 @@ const Create = ({ placeholder }) => {
                     <label htmlFor="" className="form-label">
                       Image
                     </label>
-                    <input type="file" className="form-control" />
+                    <input
+                      type="file"
+                      className="form-control"
+                      onChange={handleFile}
+                    />
+                  </div>
+
+                  <div className="mb-3">
+                    <div className="row">
+                      {galleryImages &&
+                        galleryImages.map((image, index) => (
+                          <div className="col-md-3" key={`image-${index}`}>
+                            <div className="card shadow">
+                              <img src={image} alt="" className="w-100" />
+                              <button
+                                className="btn btn-danger"
+                                onClick={() => deleteImage(image)}
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
                   </div>
                 </div>
               </div>
