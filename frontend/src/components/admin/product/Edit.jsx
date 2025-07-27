@@ -171,6 +171,28 @@ const Edit = ({ placeholder }) => {
     setGalleryImages(newGallery);
   };
 
+  const changeImage = async (image) => {
+    const res = await fetch(
+      `${apiUrl}/change-product-default-image?product_id=${params.id}&image=${image}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${adminToken()}`,
+        },
+      }
+    )
+      .then((res) => res.json())
+      .then((result) => {
+        if (result.status == 200) {
+          toast.success(result.message);
+        } else {
+          console.error("Failed to set default image");
+        }
+      });
+  };
+
   useEffect(() => {
     fetchCategories();
     fetchBrands();
@@ -452,21 +474,29 @@ const Edit = ({ placeholder }) => {
                   <div className="mb-3">
                     <div className="row">
                       {productImages &&
-                        productImages.map((image, index) => (
+                        productImages.map((productImage, index) => (
                           <div className="col-md-3" key={`image-${index}`}>
                             <div className="card shadow">
                               <img
-                                src={image.image_url}
+                                src={productImage.image_url}
                                 alt=""
                                 className="w-100"
                               />
                             </div>
-                            <button
-                              className="btn btn-danger mt-3 w-100"
-                              onClick={() => deleteImage(image)}
-                            >
-                              Delete
-                            </button>
+                            <div className="d-flex justify-content-between mt-3">
+                              <button
+                                className="btn btn-danger w-40 mb-3"
+                                onClick={() => deleteImage(productImage.image)}
+                              >
+                                Delete
+                              </button>
+                              <button
+                                className="btn btn-primary w-60 mb-3"
+                                onClick={() => changeImage(productImage.image)}
+                              >
+                                Set As Default
+                              </button>
+                            </div>
                           </div>
                         ))}
                     </div>
