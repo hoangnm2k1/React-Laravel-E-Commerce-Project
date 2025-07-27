@@ -19,7 +19,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::with('category', 'brand')->orderBy('created_at', 'DESC')->get();
+        $products = Product::with('productImages')->orderBy('created_at', 'DESC')->get();
         return response()->json([
             'status' => 200,
             'data' => $products,
@@ -117,7 +117,7 @@ class ProductController extends Controller
      */
     public function show(string $id)
     {
-        $product = Product::find($id);
+        $product = Product::with('productImages')->find($id);
 
         if (!$product) {
             return response()->json([
@@ -199,6 +199,47 @@ class ProductController extends Controller
         return response()->json([
             'status' => 200,
             'message' => 'Product deleted successfully'
+        ], 200);
+    }
+
+    public function saveProductImage(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'image' => 'required|mimes:jpeg,png,jpg,gif',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 400,
+                'error' => $validator->errors()
+            ], 400);
+        }
+
+        $image = $request->file('image');
+        $imageName = $request->product_id . '-' . time() . '.' . $image->extension();
+
+        //large thumbnail
+        $manager = new ImageManager(Driver::class);
+        $img = $manager->read($image->getPathname());
+        $img->scaleDown(1200);
+        $img->save(public_path('uploads/products/large/' . $imageName));
+
+        //small thumbnail
+        $manager = new ImageManager(Driver::class);
+        $img = $manager->read($image->getPathname());
+        $img->coverDown(400, 460);
+        $img->save(public_path('uploads/products/small/' . $imageName));
+
+        //create product image
+        $productImage = ProductImage::create([
+            'image' => $imageName,
+            'product_id' => $request->product_id
+        ]);
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Image uploaded successfully',
+            'data' => $productImage
         ], 200);
     }
 }

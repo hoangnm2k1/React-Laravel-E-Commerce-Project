@@ -18,6 +18,7 @@ const Edit = ({ placeholder }) => {
   const [categories, setCategories] = useState([]);
   const [gallery, setGallery] = useState([]);
   const [galleryImages, setGalleryImages] = useState([]);
+  const [productImages, setProductImages] = useState([]);
   const [product, setProduct] = useState([]);
 
   const [brands, setBrands] = useState([]);
@@ -50,15 +51,13 @@ const Edit = ({ placeholder }) => {
         .then((res) => res.json())
         .then((result) => {
           if (result.status == 200) {
-            setProduct(result.data);
+            setProductImages(result.data.product_images);
             reset({
               title: result.data.title,
               price: result.data.price,
               compare_price: result.data.compare_price,
               description: result.data.description,
               short_description: result.data.short_description,
-              // image: result.data.image,
-              // image_url: result.data.image_url,
               sku: result.data.sku,
               barcode: result.data.barcode,
               quantity: result.data.quantity,
@@ -75,7 +74,6 @@ const Edit = ({ placeholder }) => {
   });
 
   const saveProduct = async (data) => {
-    console.log(data);
     const formData = { ...data, description: content, gallery: gallery };
     setDisable(true);
     const res = await fetch(`${apiUrl}/products`, {
@@ -142,9 +140,10 @@ const Edit = ({ placeholder }) => {
     const formData = new FormData();
     const file = e.target.files[0];
     formData.append("image", file);
+    formData.append("product_id", params.id);
     setDisable(true);
 
-    const res = await fetch(`${apiUrl}/temp-images`, {
+    const res = await fetch(`${apiUrl}/save-product-image`, {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -154,10 +153,14 @@ const Edit = ({ placeholder }) => {
     })
       .then((res) => res.json())
       .then((result) => {
-        gallery.push(result.data.id);
-        setGallery(gallery);
-        galleryImages.push(result.data.image_url);
-        setGalleryImages(galleryImages);
+        console.log("fetch image:", result);
+
+        if (result.status == 200) {
+          productImages.push(result.data);
+          setProductImages(productImages);
+        } else {
+          toast.error(result.error.image[0]);
+        }
         setDisable(false);
         e.target.value = "";
       });
@@ -448,18 +451,22 @@ const Edit = ({ placeholder }) => {
 
                   <div className="mb-3">
                     <div className="row">
-                      {galleryImages &&
-                        galleryImages.map((image, index) => (
+                      {productImages &&
+                        productImages.map((image, index) => (
                           <div className="col-md-3" key={`image-${index}`}>
                             <div className="card shadow">
-                              <img src={image} alt="" className="w-100" />
-                              <button
-                                className="btn btn-danger"
-                                onClick={() => deleteImage(image)}
-                              >
-                                Delete
-                              </button>
+                              <img
+                                src={image.image_url}
+                                alt=""
+                                className="w-100"
+                              />
                             </div>
+                            <button
+                              className="btn btn-danger mt-3 w-100"
+                              onClick={() => deleteImage(image)}
+                            >
+                              Delete
+                            </button>
                           </div>
                         ))}
                     </div>
@@ -472,7 +479,7 @@ const Edit = ({ placeholder }) => {
                 type="submit"
                 className="btn btn-primary mt-3 mb-5"
               >
-                Create
+                Update
               </button>
             </form>
           </div>

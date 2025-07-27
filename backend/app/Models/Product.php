@@ -43,7 +43,7 @@ class Product extends Model
         return $this->belongsTo(Brand::class);
     }
 
-    public function images()
+    public function productImages()
     {
         return $this->hasMany(ProductImage::class);
     }
@@ -52,5 +52,4 @@ class Product extends Model
     {
         return $this->hasMany(ProductSize::class);
     }
-
 }
