@@ -73,8 +73,6 @@ class ProductController extends Controller
 
         // $product = Product::create($request->all());
 
-        Log::info('Product store payload', $request->all());
-
     if ($request->gallery) {
         foreach ($request->gallery as $key => $tempImageId) {
             $tempImage = TempImage::find($tempImageId);

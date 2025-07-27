@@ -1,25 +1,28 @@
 import React from "react";
 import Layout from "../../common/Layout";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import Sidebar from "../../common/Sidebar";
-import { useState, useRef, useMemo } from "react";
-import { set, useForm } from "react-hook-form";
-import { adminToken, apiUrl } from "../../common/Http";
-import { toast } from "react-toastify";
-import { useEffect } from "react";
 import JoditEditor from "jodit-react";
-import { Placeholder } from "react-bootstrap";
+import { useEffect } from "react";
+import { adminToken, apiUrl } from "../../common/Http";
+import { useForm } from "react-hook-form";
+import { useMemo } from "react";
+import { useState } from "react";
+import { useRef } from "react";
+import { toast } from "react-toastify";
 
-const Create = ({ placeholder }) => {
+const Edit = ({ placeholder }) => {
   const editor = useRef(null);
   const [content, setContent] = useState("");
   const [disable, setDisable] = useState(false);
   const [categories, setCategories] = useState([]);
   const [gallery, setGallery] = useState([]);
   const [galleryImages, setGalleryImages] = useState([]);
+  const [product, setProduct] = useState([]);
 
   const [brands, setBrands] = useState([]);
   const navigate = useNavigate();
+  const params = useParams();
 
   const config = useMemo(
     () => ({
@@ -32,9 +35,44 @@ const Create = ({ placeholder }) => {
   const {
     register,
     handleSubmit,
+    reset,
     setError,
     formState: { errors },
-  } = useForm();
+  } = useForm({
+    defaultValues: async () => {
+      const res = await fetch(`${apiUrl}/products/${params.id}`, {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${adminToken()}`,
+        },
+      })
+        .then((res) => res.json())
+        .then((result) => {
+          if (result.status == 200) {
+            setProduct(result.data);
+            reset({
+              title: result.data.title,
+              price: result.data.price,
+              compare_price: result.data.compare_price,
+              description: result.data.description,
+              short_description: result.data.short_description,
+              // image: result.data.image,
+              // image_url: result.data.image_url,
+              sku: result.data.sku,
+              barcode: result.data.barcode,
+              quantity: result.data.quantity,
+              category_id: result.data.category_id,
+              brand_id: result.data.brand_id,
+              status: result.data.status,
+              is_featured: result.data.is_featured,
+            });
+          } else {
+            console.log("Fail to fetch the product");
+          }
+        });
+    },
+  });
 
   const saveProduct = async (data) => {
     console.log(data);
@@ -86,7 +124,6 @@ const Create = ({ placeholder }) => {
     const res = await fetch(`${apiUrl}/brands`, {
       method: "GET",
       headers: {
-        "Content-Type": "application/json",
         Accept: "application/json",
         Authorization: `Bearer ${adminToken()}`,
       },
@@ -445,4 +482,4 @@ const Create = ({ placeholder }) => {
   );
 };
 
-export default Create;
+export default Edit;
