@@ -5,10 +5,12 @@ namespace App\Http\Controllers\admin;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductImage;
+use App\Models\ProductSize;
 use App\Models\TempImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
 
@@ -19,7 +21,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::with('productImages')->orderBy('created_at', 'DESC')->get();
+        $products = Product::with('productImages', 'productSizes')->orderBy('created_at', 'DESC')->get();
         return response()->json([
             'status' => 200,
             'data' => $products,
@@ -79,7 +81,8 @@ class ProductController extends Controller
 
             $extArray = explode('.', $tempImage->name);
             $ext = end($extArray);
-            $imageName = $product->id. '-'. time() . '.' . $ext;
+            $rand = rand(1000, 9999);
+            $imageName = $product->id. '-'. $rand . time() . '.' . $ext;
 
             //large thumbnail
             $manager = new ImageManager(Driver::class);
@@ -117,7 +120,7 @@ class ProductController extends Controller
      */
     public function show(string $id)
     {
-        $product = Product::with('productImages')->find($id);
+        $product = Product::with('productImages', 'productSizes')->find($id);
 
         if (!$product) {
             return response()->json([
@@ -127,9 +130,12 @@ class ProductController extends Controller
             ], 404);
         }
 
+        $productSizes = $product->productSizes()->pluck('size_id');
+
         return response()->json([
             'status' => 200,
-            'data' => $product
+            'data' => $product,
+            'productSizes' => $productSizes
         ], 200);
     }
 
@@ -159,7 +165,10 @@ class ProductController extends Controller
             'title' => 'required',
             'price' => 'required|numeric',
             'category_id' => 'required|integer',
-            'sku' => 'required|unique:products,sku,' . $id,
+            'sku' => [
+                'required',
+                Rule::unique('products', 'sku')->ignore($id)
+            ],
             'status' => 'required',
             'is_featured' => 'required',
         ]);
@@ -171,7 +180,31 @@ class ProductController extends Controller
             ], 400);
         }
 
-        $product->update($request->all());
+        // $product->update($request->all());
+        $product->title = $request->title;
+        $product->price = $request->price;
+        $product->compare_price = $request->compare_price;
+        $product->description = $request->description;
+        $product->short_description = $request->short_description;
+        $product->image = $request->image;
+        $product->brand_id = $request->brand_id;
+        $product->category_id = $request->category_id;
+        $product->quantity = $request->quantity;
+        $product->sku = $request->sku;
+        $product->barcode = $request->barcode;
+        $product->status = $request->status;
+        $product->is_featured = $request->is_featured;
+        $product->save();
+
+        if (!empty($request->sizes)) {
+            ProductSize::where('product_id', $product->id)->delete();
+            foreach ($request->sizes as $sizeId) {
+                ProductSize::create([
+                    'product_id' => $product->id,
+                    'size_id' => $sizeId
+                ]);
+            }
+        }
 
         return response()->json([
             'status' => 200,
