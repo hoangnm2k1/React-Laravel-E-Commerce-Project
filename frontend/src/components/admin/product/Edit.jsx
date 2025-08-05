@@ -181,11 +181,6 @@ const Edit = ({ placeholder }) => {
       });
   };
 
-  const deleteImage = (image) => {
-    const newGallery = galleryImages.filter((img) => img !== image);
-    setGalleryImages(newGallery);
-  };
-
   const changeImage = async (image) => {
     const res = await fetch(
       `${apiUrl}/change-product-default-image?product_id=${params.id}&image=${image}`,
@@ -204,6 +199,26 @@ const Edit = ({ placeholder }) => {
           toast.success(result.message);
         } else {
           console.error("Failed to set default image");
+        }
+      });
+  };
+
+  const deleteImage = async (id) => {
+    const res = await fetch(`${apiUrl}/delete-product-image/${id}`, {
+      method: "DELETE",
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${adminToken()}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((result) => {
+        if (result.status == 200) {
+          const newProductImages = productImages.filter((img) => img.id !== id);
+          setProductImages(newProductImages);
+          toast.success(result.message);
+        } else {
+          console.error("Failed to set delete image");
         }
       });
   };
@@ -538,8 +553,9 @@ const Edit = ({ placeholder }) => {
                             </div>
                             <div className="d-flex justify-content-between mt-3">
                               <button
+                                type="button"
                                 className="btn btn-danger w-40 mb-3"
-                                onClick={() => deleteImage(productImage.image)}
+                                onClick={() => deleteImage(productImage.id)}
                               >
                                 Delete
                               </button>

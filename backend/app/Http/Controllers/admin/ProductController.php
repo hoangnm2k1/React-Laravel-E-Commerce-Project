@@ -8,6 +8,7 @@ use App\Models\ProductImage;
 use App\Models\ProductSize;
 use App\Models\TempImage;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -186,7 +187,7 @@ class ProductController extends Controller
         $product->compare_price = $request->compare_price;
         $product->description = $request->description;
         $product->short_description = $request->short_description;
-        $product->image = $request->image;
+        // $product->image = $request->image;
         $product->brand_id = $request->brand_id;
         $product->category_id = $request->category_id;
         $product->quantity = $request->quantity;
@@ -286,6 +287,30 @@ class ProductController extends Controller
             'status' => 200,
             'message' => 'Default image updated successfully',
             'data' => $product
+        ], 200);
+    }
+
+    public function deleteProductImage(Request $request)
+    {
+        $productImage = ProductImage::find($request->id);
+
+        if (!$productImage) {
+            return response()->json([
+                'status' => 404,
+                'message' => 'Product image not found',
+            ], 404);
+        }
+
+        // Delete the image files
+        File::delete(public_path('uploads/products/large/' . $productImage->image));
+        File::delete(public_path('uploads/products/small/' . $productImage->image));
+
+        // Delete the product image record
+        $productImage->delete();
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Product image deleted successfully'
         ], 200);
     }
 }
