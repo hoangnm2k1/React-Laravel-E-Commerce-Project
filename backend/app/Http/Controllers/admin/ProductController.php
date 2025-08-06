@@ -76,6 +76,15 @@ class ProductController extends Controller
 
         // $product = Product::create($request->all());
 
+    if (!empty($request->sizes)) {
+        foreach ($request->sizes as $sizeId) {
+            ProductSize::create([
+                'product_id' => $product->id,
+                'size_id' => $sizeId
+            ]);
+        }
+    }
+
     if ($request->gallery) {
         foreach ($request->gallery as $key => $tempImageId) {
             $tempImage = TempImage::find($tempImageId);
