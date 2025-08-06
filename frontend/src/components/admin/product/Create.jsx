@@ -17,6 +17,7 @@ const Create = ({ placeholder }) => {
   const [categories, setCategories] = useState([]);
   const [gallery, setGallery] = useState([]);
   const [galleryImages, setGalleryImages] = useState([]);
+  const [sizes, setSizes] = useState([]);
 
   const [brands, setBrands] = useState([]);
   const navigate = useNavigate();
@@ -131,9 +132,27 @@ const Create = ({ placeholder }) => {
     setGalleryImages(newGallery);
   };
 
+  const fetchSizes = async () => {
+    const res = await fetch(`${apiUrl}/sizes`, {
+      method: "GET",
+      headers: {
+        "Contetnt-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${adminToken()}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((result) => {
+        console.log("size", result);
+
+        setSizes(result.data);
+      });
+  };
+
   useEffect(() => {
     fetchCategories();
     fetchBrands();
+    fetchSizes();
   }, []);
 
   return (
@@ -395,6 +414,33 @@ const Create = ({ placeholder }) => {
                         )}
                       </div>
                     </div>
+                  </div>
+
+                  <div className="mb-3">
+                    <label htmlFor="" className="form-label">
+                      Sizes
+                    </label>
+                    {sizes &&
+                      sizes.map((size) => (
+                        <div
+                          className="form-check-inline ps-2"
+                          key={`size-${size.id}`}
+                        >
+                          <input
+                            {...register("sizes")}
+                            value={size.id}
+                            type="checkbox"
+                            className="form-check-input"
+                            id={`size-${size.id}`}
+                          />
+                          <label
+                            htmlFor={`size-${size.id}`}
+                            className="form-check-label ps-2"
+                          >
+                            {size.name}
+                          </label>
+                        </div>
+                      ))}
                   </div>
 
                   <h3 className="py-3 border-bottom mb-3">Gallery</h3>
