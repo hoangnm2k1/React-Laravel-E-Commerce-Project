@@ -1,6 +1,5 @@
 import React from "react";
 import Layout from "./common/Layout";
-import ProductImg from "../assets/images/men/eight.jpg";
 import { Link, useSearchParams } from "react-router-dom";
 import { useState } from "react";
 import { useEffect } from "react";
@@ -133,9 +132,13 @@ const Shop = () => {
                             type="checkbox"
                             value={category.id}
                             onChange={handleCategory}
-                            checked={checkedCategories.includes(
-                              category.id.toString()
-                            )}
+                            defaultChecked={
+                              filterParams.get("category")
+                                ? filterParams
+                                    .get("category")
+                                    .includes(category.id)
+                                : false
+                            }
                           />
                           <label htmlFor="" className="ps-2">
                             {category.name}
@@ -156,9 +159,11 @@ const Shop = () => {
                             type="checkbox"
                             value={brand.id}
                             onChange={handleBrand}
-                            checked={checkedBrands.includes(
-                              brand.id.toString()
-                            )}
+                            defaultChecked={
+                              filterParams.get("brand")
+                                ? filterParams.get("brand").includes(brand.id)
+                                : false
+                            }
                           />
                           <label htmlFor="" className="ps-2">
                             {brand.name}
@@ -179,7 +184,7 @@ const Shop = () => {
                     >
                       <div className="product card border-0">
                         <div className="card-img">
-                          <Link to="/product">
+                          <Link to={`/product/${product.id}`}>
                             <img
                               src={product.image_url}
                               alt={product.title}
@@ -188,7 +193,9 @@ const Shop = () => {
                           </Link>
                         </div>
                         <div className="card-body pt-3">
-                          <Link to="/product">{product.title}</Link>
+                          <Link to={`/product/${product.id}`}>
+                            {product.title}
+                          </Link>
                           <div className="price">
                             ${product.price} &nbsp;
                             {product.compare_price && (

@@ -1,7 +1,7 @@
 import React from "react";
 import { useState } from "react";
 import Layout from "./common/Layout";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Thumbs, FreeMode, Navigation } from "swiper/modules";
 import { Rating } from "react-simple-star-rating";
@@ -11,13 +11,36 @@ import "swiper/css";
 import "swiper/css/free-mode";
 import "swiper/css/navigation";
 import "swiper/css/thumbs";
-import ProductImgOne from "../assets/images/men/five.jpg";
-import ProductImgTwo from "../assets/images/men/six.jpg";
-import ProductImgThree from "../assets/images/men/seven.jpg";
+import { apiUrl } from "./common/Http";
+import { useEffect } from "react";
+import { set } from "react-hook-form";
 
 const Product = () => {
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
   const [rating, setRating] = useState(4);
+  const [product, setProduct] = useState(null);
+  const [productImages, setProductImages] = useState([]);
+  const [productSizes, setProductSizes] = useState([]);
+  const params = useParams();
+
+  const fetchProductDetails = () => {
+    fetch(`${apiUrl}/get-product/${params.id}`)
+      .then((res) => res.json())
+      .then((result) => {
+        console.log(result);
+        if (result.status == 200) {
+          setProduct(result.data);
+          setProductImages(result.data.product_images);
+          setProductSizes(result.data.product_sizes);
+        } else {
+          console.error("Failed to fetch product details");
+        }
+      });
+  };
+
+  useEffect(() => {
+    fetchProductDetails();
+  }, []);
 
   return (
     <Layout>
@@ -54,36 +77,20 @@ const Product = () => {
                   modules={[FreeMode, Navigation, Thumbs]}
                   className="mySwiper mt-2"
                 >
-                  <SwiperSlide>
-                    <div className="content">
-                      <img
-                        src={ProductImgOne}
-                        alt=""
-                        height={100}
-                        className="w-100"
-                      />
-                    </div>
-                  </SwiperSlide>
-                  <SwiperSlide>
-                    <div className="content">
-                      <img
-                        src={ProductImgTwo}
-                        alt=""
-                        height={100}
-                        className="w-100"
-                      />
-                    </div>
-                  </SwiperSlide>
-                  <SwiperSlide>
-                    <div className="content">
-                      <img
-                        src={ProductImgThree}
-                        alt=""
-                        height={100}
-                        className="w-100"
-                      />
-                    </div>
-                  </SwiperSlide>
+                  {productImages &&
+                    productImages.map((image, index) => (
+                      <SwiperSlide>
+                        <div className="content">
+                          <img
+                            src={image.image_url}
+                            alt=""
+                            className="w-100"
+                            height={100}
+                            key={`image-${index}`}
+                          />
+                        </div>
+                      </SwiperSlide>
+                    ))}
                 </Swiper>
               </div>
               <div className="col-10">
@@ -95,71 +102,84 @@ const Product = () => {
                   modules={[FreeMode, Navigation, Thumbs]}
                   className="mySwiper2"
                 >
-                  <SwiperSlide>
-                    <div className="content">
-                      <img src={ProductImgOne} alt="" className="w-100" />
-                    </div>
-                  </SwiperSlide>
-                  <SwiperSlide>
-                    <div className="content">
-                      <img src={ProductImgTwo} alt="" className="w-100" />
-                    </div>
-                  </SwiperSlide>
-                  <SwiperSlide>
-                    <div className="content">
-                      <img src={ProductImgThree} alt="" className="w-100" />
-                    </div>
-                  </SwiperSlide>
+                  {productImages &&
+                    productImages.map((image, index) => (
+                      <SwiperSlide>
+                        <div className="content">
+                          <img
+                            src={image.image_url}
+                            alt=""
+                            className="w-100"
+                            key={`image-${index}`}
+                          />
+                        </div>
+                      </SwiperSlide>
+                    ))}
                 </Swiper>
               </div>
             </div>
           </div>
-          <div className="col-md-7">
-            <h2>Product Title</h2>
-            <div className="d-flex">
-              <Rating size={20} readonly initialValue={rating} />
-              <span className="pt-1 ps-2">10 Reviews</span>
-            </div>
-            <div className="price h3 py-3">
-              $20 <span className="text-decoration-line-through">$25</span>
-            </div>
-            <div className="desc">
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit. <br />
-              Aspernatur tempora ut laborum ducimus quisquam fugit ratione{" "}
-              <br />
-              voluptatum cumque tenetur odit.
-            </div>
-            <div className="pt-3">
-              <strong>Select Size</strong>
-              <div className="sizes pt-2">
-                <button className="btn btn-size">S</button>
-                <button className="btn btn-size ms-1">M</button>
-                <button className="btn btn-size ms-1">L</button>
-                <button className="btn btn-size ms-1">XL</button>
+          {product != null ? (
+            <div className="col-md-7">
+              <h2>{product.title}</h2>
+              <div className="d-flex">
+                <Rating size={20} readonly initialValue={rating} />
+                <span className="pt-1 ps-2">10 Reviews</span>
               </div>
-              <div className="add-to-cart my-4">
-                <button className="btn btn-primary text-uppercase">
-                  Add to Cart
-                </button>
+              <div className="price h3 py-3">
+                ${product.price} &nbsp;
+                {product.compare_price && (
+                  <span className="text-decoration-line-through">
+                    ${product.compare_price}
+                  </span>
+                )}
               </div>
-              <hr />
-              <div>
-                <strong>SKU: DDXX2234</strong>
+              <div className="desc">{product.short_description}</div>
+              <div className="pt-3">
+                <strong>Select Size</strong>
+                <div className="sizes pt-2">
+                  {productSizes &&
+                    productSizes.map((productSize, index) => (
+                      <button
+                        className="btn btn-size me-2"
+                        key={`size-${index}`}
+                      >
+                        {productSize.size.name}
+                      </button>
+                    ))}
+                </div>
+                <div className="add-to-cart my-4">
+                  <button className="btn btn-primary text-uppercase">
+                    Add to Cart
+                  </button>
+                </div>
+                <hr />
+                <div>
+                  <strong>SKU: {product.sku && product.sku}</strong>
+                </div>
               </div>
             </div>
-          </div>
+          ) : (
+            <div>Loading...</div>
+          )}
         </div>
         <div className="row pb-5">
           <div className="col-md-12">
             <Tabs
-              defaultActiveKey="profile"
+              defaultActiveKey="description"
               id="uncontrolled-tab-example"
               className="mb-3"
             >
-              <Tab eventKey="home" title="Description">
-                Description
+              <Tab eventKey="description" title="Description">
+                {product && product.description ? (
+                  <div
+                    dangerouslySetInnerHTML={{ __html: product.description }}
+                  ></div>
+                ) : (
+                  <p>Ask admin to add description</p>
+                )}
               </Tab>
-              <Tab eventKey="profile" title="Reviews (10)">
+              <Tab eventKey="reviews" title="Reviews (10)">
                 Reviews
               </Tab>
             </Tabs>

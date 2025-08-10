@@ -2,8 +2,30 @@ import React from "react";
 import { Nav, Navbar } from "react-bootstrap";
 import Logo from "../../assets/images/logo.png";
 import { Link } from "react-router-dom";
+import { apiUrl } from "./Http";
+import { use } from "react";
+import { useEffect } from "react";
 
 const Header = () => {
+  const [categories, setCategories] = React.useState([]);
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch(`${apiUrl}/get-categories`);
+      const data = await response.json();
+      if (data.status === 200) {
+        setCategories(data.data);
+      } else {
+        console.error("Failed to fetch categories");
+      }
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
   return (
     <header className="shadow">
       <div className="bg-dark text-center py-3">
@@ -17,9 +39,15 @@ const Header = () => {
           <Navbar.Toggle aria-controls="navbarScroll" />
           <Navbar.Collapse id="navbarScroll">
             <Nav className="ms-auto my-2 my-lg-0" navbarScroll>
-              <Nav.Link href="#action1">Men</Nav.Link>
-              <Nav.Link href="#action2">Women</Nav.Link>
-              <Nav.Link href="#action2">Kids</Nav.Link>
+              {categories &&
+                categories.map((category) => (
+                  <Nav.Link
+                    href={`/shop?category=${category.id}`}
+                    key={category.id}
+                  >
+                    {category.name}
+                  </Nav.Link>
+                ))}
             </Nav>
             <div className="nav-right d-flex">
               <Link to="" className="ms-3">

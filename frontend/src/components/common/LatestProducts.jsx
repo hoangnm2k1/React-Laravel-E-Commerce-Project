@@ -2,6 +2,7 @@ import React from "react";
 import { useState } from "react";
 import { apiUrl } from "./Http";
 import { useEffect } from "react";
+import { Link } from "react-router-dom";
 
 const LatestProducts = () => {
   const [latestProducts, setLatestProducts] = useState([]);
@@ -36,26 +37,28 @@ const LatestProducts = () => {
           {latestProducts &&
             latestProducts.map((product) => (
               <div className="col-md-3 col-6" key={`product-${product.id}`}>
-                <div className="product card border-0">
-                  <div className="card-img">
-                    <img
-                      src={product.image_url}
-                      alt={product.title}
-                      className="w-100"
-                    />
-                  </div>
-                  <div className="card-body pt-3">
-                    <a href="">{product.title}</a>
-                    <div className="price">
-                      ${product.price} &nbsp;
-                      {product.compare_price && (
-                        <span className="text-decoration-line-through">
-                          ${product.compare_price}
-                        </span>
-                      )}
+                <Link to={`/product/${product.id}`}>
+                  <div className="product card border-0">
+                    <div className="card-img">
+                      <img
+                        src={product.image_url}
+                        alt={product.title}
+                        className="w-100"
+                      />
+                    </div>
+                    <div className="card-body pt-3">
+                      <Link to={`/product/${product.id}`}>{product.title}</Link>
+                      <div className="price">
+                        ${product.price} &nbsp;
+                        {product.compare_price && (
+                          <span className="text-decoration-line-through">
+                            ${product.compare_price}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
+                </Link>
               </div>
             ))}
         </div>
