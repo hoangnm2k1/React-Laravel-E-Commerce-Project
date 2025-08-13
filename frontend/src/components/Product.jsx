@@ -14,6 +14,9 @@ import "swiper/css/thumbs";
 import { apiUrl } from "./common/Http";
 import { useEffect } from "react";
 import { set } from "react-hook-form";
+import { useContext } from "react";
+import { CartContext } from "./context/CartContext";
+import { toast } from "react-toastify";
 
 const Product = () => {
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
@@ -21,7 +24,9 @@ const Product = () => {
   const [product, setProduct] = useState(null);
   const [productImages, setProductImages] = useState([]);
   const [productSizes, setProductSizes] = useState([]);
+  const [sizeSelected, setSizeSelected] = useState(null);
   const params = useParams();
+  const { addToCart } = useContext(CartContext);
 
   const fetchProductDetails = () => {
     fetch(`${apiUrl}/get-product/${params.id}`)
@@ -36,6 +41,28 @@ const Product = () => {
           console.error("Failed to fetch product details");
         }
       });
+  };
+
+  const handleAddToCart = () => {
+    if (productSizes.length > 0) {
+      if (sizeSelected === null) {
+        toast.error("Please select a size");
+        return;
+      } else {
+        const selectedSizeObj = productSizes.find(
+          (ps) => ps.size.name === sizeSelected
+        );
+        if (selectedSizeObj) {
+          addToCart(product, selectedSizeObj.size.name);
+          toast.success("Product added to cart");
+        } else {
+          toast.error("Invalid size selected");
+        }
+      }
+    } else {
+      addToCart(product, null);
+      toast.success("Product added to cart");
+    }
   };
 
   useEffect(() => {
@@ -139,17 +166,25 @@ const Product = () => {
                 <strong>Select Size</strong>
                 <div className="sizes pt-2">
                   {productSizes &&
-                    productSizes.map((productSize, index) => (
+                    productSizes.map((productSize) => (
                       <button
-                        className="btn btn-size me-2"
-                        key={`size-${index}`}
+                        className={`btn btn-size me-2 ${
+                          sizeSelected === productSize.size.name
+                            ? "bg-info"
+                            : ""
+                        }`}
+                        key={`size-${productSize.size_id}`}
+                        onClick={() => setSizeSelected(productSize.size.name)}
                       >
                         {productSize.size.name}
                       </button>
                     ))}
                 </div>
                 <div className="add-to-cart my-4">
-                  <button className="btn btn-primary text-uppercase">
+                  <button
+                    onClick={() => handleAddToCart()}
+                    className="btn btn-primary text-uppercase"
+                  >
                     Add to Cart
                   </button>
                 </div>
