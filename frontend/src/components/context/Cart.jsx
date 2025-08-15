@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { CartContext } from "./CartContext";
+import { set } from "react-hook-form";
 
 export const CartProvider = ({ children }) => {
   const [cartData, setCartData] = useState(
@@ -90,9 +91,44 @@ export const CartProvider = ({ children }) => {
     return subTotal() + shipping();
   };
 
+  const updateCartItem = (itemId, newQuantity) => {
+    let updatedCart = [...cartData];
+    updatedCart = updatedCart.map((item) => {
+      if (item.id == itemId) {
+        return { ...item, quantity: newQuantity };
+      }
+      return item;
+    });
+    setCartData(updatedCart);
+    localStorage.setItem("cart", JSON.stringify(updatedCart));
+  };
+
+  const deleteCartItem = (itemId) => {
+    let updatedCart = cartData.filter((item) => item.id !== itemId);
+    setCartData(updatedCart);
+    localStorage.setItem("cart", JSON.stringify(updatedCart));
+  };
+
+  const getTotalQuantity = () => {
+    let totalQuantity = 0;
+    cartData.map((item) => {
+      totalQuantity += parseInt(item.quantity);
+    });
+    return totalQuantity;
+  };
+
   return (
     <CartContext.Provider
-      value={{ addToCart, cartData, subTotal, grandTotal, shipping }}
+      value={{
+        addToCart,
+        cartData,
+        subTotal,
+        grandTotal,
+        shipping,
+        updateCartItem,
+        deleteCartItem,
+        getTotalQuantity,
+      }}
     >
       {children}
     </CartContext.Provider>
