@@ -1,15 +1,20 @@
 import { useState } from "react";
-import Home from "./components/Home";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import { AdminRequireAuth } from "./components/admin/AdminRequireAuth";
+import { AdminAuthProvider } from "./components/context/AdminAuth";
+
+import Home from "./components/Home";
 import Shop from "./components/Shop";
 import Product from "./components/Product";
 import Cart from "./components/Cart";
 import Checkout from "./components/Checkout";
 import Login from "./components/admin/Login";
-import { ToastContainer, toast } from "react-toastify";
 import Dashboard from "./components/admin/Dashboard";
-import { AdminRequireAuth } from "./components/admin/AdminRequireAuth";
-import { AdminAuthProvider } from "./components/context/AdminAuth";
+import Register from "./components/Register";
+import Profile from "./components/Profile";
+import { RequireAuth } from "./components/RequireAuth";
+import { default as UserLogin } from "./components/Login";
 
 import { default as ShowCategories } from "./components/admin/category/Show";
 import { default as CreateCategory } from "./components/admin/category/Create";
@@ -33,6 +38,17 @@ function App() {
           <Route path="/product/:id" element={<Product />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
+          <Route path="/account/register" element={<Register />} />
+          <Route path="/account/login" element={<UserLogin />} />
+
+          <Route
+            path="/account"
+            element={
+              <RequireAuth>
+                <Profile />
+              </RequireAuth>
+            }
+          />
 
           <Route
             path="/admin/login"
@@ -147,7 +163,7 @@ function App() {
             element={
               <AdminAuthProvider>
                 <AdminRequireAuth>
-                  <EditProduct />
+                  <EditProduct placeholder="" />
                 </AdminRequireAuth>
               </AdminAuthProvider>
             }

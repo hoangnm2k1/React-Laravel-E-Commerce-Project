@@ -49,7 +49,5 @@ class AuthController extends Controller
                 'message' => 'Incorrect email or password',
             ], 401);
         }
-
-
     }
 }
