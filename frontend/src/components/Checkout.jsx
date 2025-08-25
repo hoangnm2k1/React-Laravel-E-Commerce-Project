@@ -47,7 +47,6 @@ const Checkout = () => {
       });
 
       const result = await response.json();
-      // console.log(result);
 
       if (result.status == 200) {
         toast.success(result.message);

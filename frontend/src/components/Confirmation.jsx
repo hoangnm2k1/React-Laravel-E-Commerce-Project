@@ -1,107 +1,173 @@
 import React, { useEffect, useState } from "react";
 import Layout from "./common/Layout";
 import { Link, useParams } from "react-router-dom";
+import { apiUrl, userToken } from "./common/Http";
+import { toast } from "react-toastify";
 
 const Confirmation = () => {
-  const { orderId } = useParams();
+  const params = useParams();
   const [order, setOrder] = useState(null);
+  const [items, setItems] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const fetchOrder = () => {
+    fetch(`${apiUrl}/get-order-details/${params.id}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${userToken()}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((result) => {
+        console.log(result);
+
+        setLoading(false);
+        if (result.status == 200) {
+          setOrder(result.order);
+          setItems(result.order.order_items);
+        } else {
+          toast.error(result.message);
+        }
+      });
+  };
 
   useEffect(() => {
     fetchOrder();
-  }, [orderId]);
-
-  const fetchOrder = async () => {
-    try {
-      const response = await fetch(`/api/orders/${orderId}`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      const result = await response.json();
-      if (result.status === 200) {
-        setOrder(result.order);
-      }
-    } catch (error) {
-      console.error('Error:', error);
-    }
-  };
-
-  if (!order) return <Layout><div>Loading...</div></Layout>;
+  }, []);
 
   return (
     <Layout>
       <div className="container py-5">
-        <div className="text-center mb-5">
-          <h1 className="primary-text">Thank You!</h1>
-          <p>You have successfully placed your order.</p>
-        </div>
-
-        <div className="row justify-content-center">
-          <div className="col-md-8">
-            <div className="card">
-              <div className="card-header">
-                <h3>Order Summary</h3>
+        {loading == true && (
+          <div className="text-center py-5">
+            <div className="spinner-border" role="status">
+              <div className="visually-hidden">
+                <span>Loading...</span>
               </div>
+            </div>
+          </div>
+        )}
+        {loading == false && order && (
+          <div>
+            <div className="text-center fw-bold text-success">
+              <h1 className="primary-text">Thank You!</h1>
+              <p className="text-muted text-center">
+                You have successfully placed your order.
+              </p>
+            </div>
+
+            <div className="card shadow">
               <div className="card-body">
-                <div className="row mb-3">
-                  <div className="col-md-6">
-                    <p><strong>Order ID:</strong> #{order.id}</p>
-                    <p><strong>Order Date:</strong> {new Date(order.created_at).toLocaleDateString()}</p>
-                    <p><strong>Status:</strong> <span className="badge bg-warning">{order.status}</span></p>
-                    <p><strong>Payment:</strong> {order.payment_status}</p>
-                  </div>
-                  <div className="col-md-6">
-                    <p><strong>Customer:</strong> {order.name}</p>
-                    <p><strong>Address:</strong> {order.address}</p>
-                    <p><strong>Contact:</strong> {order.mobile}</p>
-                  </div>
-                </div>
-
-                <h4>Items</h4>
-                <table className="table">
-                  <thead>
-                    <tr>
-                      <th>Item</th>
-                      <th>Quantity</th>
-                      <th>Price</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {order.order_items && order.order_items.map((item, index) => (
-                      <tr key={index}>
-                        <td>{item.name} {item.size && `(${item.size})`}</td>
-                        <td>{item.quantity}</td>
-                        <td>${item.price}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-
+                <h2 className="fw-bold">Order Summary</h2>
+                <hr />
                 <div className="row">
-                  <div className="col-md-6 ms-auto">
-                    <div className="d-flex justify-content-between">
-                      <span>Subtotal:</span>
-                      <span>${order.subtotal}</span>
-                    </div>
-                    <div className="d-flex justify-content-between">
-                      <span>Shipping:</span>
-                      <span>${order.shipping}</span>
-                    </div>
-                    <div className="d-flex justify-content-between border-top pt-2">
-                      <strong>Grand Total:</strong>
-                      <strong>${order.grand_total}</strong>
-                    </div>
+                  <div className="col-6">
+                    <p>
+                      <strong>Order ID: </strong> #{order.id}
+                    </p>
+                    <p>
+                      <strong>Date: </strong> {order.created_at}
+                    </p>
+                    <p>
+                      <strong>Status: </strong>
+                      {order.status == "pending" && (
+                        <span className="badge bg-warning">Pending</span>
+                      )}
+
+                      {order.status == "shipped" && (
+                        <span className="badge bg-warning">Shipped</span>
+                      )}
+
+                      {order.status == "delivered" && (
+                        <span className="badge bg-success">Delivered</span>
+                      )}
+
+                      {order.status == "cancelled" && (
+                        <span className="badge bg-danger">Cancelled</span>
+                      )}
+                    </p>
+                    <p>
+                      <strong>Payment Method: </strong> COD
+                    </p>
+                  </div>
+                  <div className="col-6">
+                    <p>
+                      <strong>Customer: </strong> {order.name}
+                    </p>
+                    <p>
+                      <strong>Address: </strong> {order.address}, {order.city},{" "}
+                      {order.state} {order.zip}
+                    </p>
+                    <p>
+                      <strong>Contact: </strong> {order.mobile}
+                    </p>
                   </div>
                 </div>
-
-                <div className="text-center mt-4">
-                  <Link to="/" className="btn btn-primary me-3">Continue Shopping</Link>
-                  <Link to={`/orders/${order.id}`} className="btn btn-secondary">View Order Details</Link>
+                <div className="row">
+                  <div className="col-12">
+                    <table className="table table-striped table-bordered">
+                      <thead className="table-light">
+                        <tr>
+                          <th>Item</th>
+                          <th>Quantity</th>
+                          <th style={{ width: 150 }}>Price</th>
+                          <th style={{ width: 150 }}>Total</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {items &&
+                          items.map((item, index) => (
+                            <tr key={`item-${index}`}>
+                              <td>{item.name}</td>
+                              <td>{item.quantity}</td>
+                              <td>${item.price}</td>
+                              <td>${item.price * item.quantity}</td>
+                            </tr>
+                          ))}
+                      </tbody>
+                      <tfoot>
+                        <tr>
+                          <td colSpan={3} className="text-end fw-bold">
+                            Subtotal
+                          </td>
+                          <td>${order.subtotal}</td>
+                        </tr>
+                        <tr>
+                          <td colSpan={3} className="text-end fw-bold">
+                            Shipping
+                          </td>
+                          <td>${order.shipping}</td>
+                        </tr>
+                        <tr>
+                          <td colSpan={3} className="text-end fw-bold">
+                            Grand Total
+                          </td>
+                          <td>
+                            <strong>${order.grand_total}</strong>
+                          </td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
+                  <div className="text-center">
+                    <button className="btn btn-primary">
+                      View Order Details
+                    </button>
+                    <Link to="/" className="btn btn-outline-secondary ms-2">
+                      Continue Shopping
+                    </Link>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
+
+        {loading == false && !order && (
+          <div className="text-center fw-bold text-muted">
+            <h1 className="primary-text">Order Not Found</h1>
+          </div>
+        )}
       </div>
     </Layout>
   );
