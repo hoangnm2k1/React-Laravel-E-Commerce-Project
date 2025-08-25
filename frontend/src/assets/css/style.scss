@@ -248,6 +248,26 @@ footer {
   }
 }
 
+
+.checkout-cart-item {
+  .item-price {
+    width: 80px;
+  }
+  
+  .item-size {
+    width: 80px;
+    padding-left: 12px;
+  }
+  
+  .size-placeholder {
+    height: 31px;
+  }
+  
+  .item-quantity {
+    padding-left: 20px;
+  }
+}
+
 @media (min-width: 200px) and (max-width: 768px) {
   .section-1 {
     .swiper {
