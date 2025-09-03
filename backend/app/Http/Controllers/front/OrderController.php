@@ -14,14 +14,14 @@ class OrderController extends Controller
     public function getOrder($id)
     {
         $order = Order::with('orderItems')->where('id', $id)->first();
-        
+
         if ($order) {
             return response()->json([
                 'status' => 200,
                 'order' => $order
             ], 200);
         }
-        
+
         return response()->json([
             'status' => 404,
             'message' => 'Order not found'

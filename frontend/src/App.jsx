@@ -28,6 +28,8 @@ import { default as EditCategory } from "./components/admin/category/Edit";
 import { default as ShowProducts } from "./components/admin/product/Show";
 import { default as CreateProduct } from "./components/admin/product/Create";
 import { default as EditProduct } from "./components/admin/product/Edit";
+import ShowOrders from "./components/admin/orders/ShowOrders";
+import OrderDetail from "./components/admin/orders/OrderDetails";
 
 function App() {
   return (
@@ -182,6 +184,28 @@ function App() {
               <AdminAuthProvider>
                 <AdminRequireAuth>
                   <EditProduct placeholder="" />
+                </AdminRequireAuth>
+              </AdminAuthProvider>
+            }
+          />
+
+          <Route
+            path="/admin/orders"
+            element={
+              <AdminAuthProvider>
+                <AdminRequireAuth>
+                  <ShowOrders />
+                </AdminRequireAuth>
+              </AdminAuthProvider>
+            }
+          />
+
+          <Route
+            path="/admin/orders/:id"
+            element={
+              <AdminAuthProvider>
+                <AdminRequireAuth>
+                  <OrderDetail />
                 </AdminRequireAuth>
               </AdminAuthProvider>
             }
