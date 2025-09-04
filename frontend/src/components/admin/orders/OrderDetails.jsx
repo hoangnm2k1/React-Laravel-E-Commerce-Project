@@ -175,15 +175,15 @@ const OrderDetail = () => {
                                       )}
                                       <div className="d-flex flex-column">
                                         <div className="mb-2">
-                                          <span>
-                                            {item.product?.name || item.name}
-                                          </span>
+                                          <span>{item.name}</span>
                                         </div>
-                                        <div>
-                                          <button className="btn btn-size">
-                                            {item.size}
-                                          </button>
-                                        </div>
+                                        {item.size && (
+                                          <div>
+                                            <button className="btn btn-size">
+                                              {item.size}
+                                            </button>
+                                          </div>
+                                        )}
                                       </div>
                                     </div>
                                     <div className="d-flex">

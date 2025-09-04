@@ -28,8 +28,12 @@ import { default as EditCategory } from "./components/admin/category/Edit";
 import { default as ShowProducts } from "./components/admin/product/Show";
 import { default as CreateProduct } from "./components/admin/product/Create";
 import { default as EditProduct } from "./components/admin/product/Edit";
+
+import { default as UserOrderDetail } from "./components/front/OrderDetail";
+
 import ShowOrders from "./components/admin/orders/ShowOrders";
 import OrderDetail from "./components/admin/orders/OrderDetails";
+import MyOrders from "./components/front/MyOrders";
 
 function App() {
   return (
@@ -53,6 +57,15 @@ function App() {
           />
 
           <Route
+            path="/account/orders/"
+            element={
+              <RequireAuth>
+                <MyOrders />
+              </RequireAuth>
+            }
+          />
+
+          <Route
             path="/checkout"
             element={
               <RequireAuth>
@@ -66,6 +79,15 @@ function App() {
             element={
               <RequireAuth>
                 <Confirmation />
+              </RequireAuth>
+            }
+          />
+
+          <Route
+            path="/account/orders/details/:id"
+            element={
+              <RequireAuth>
+                <UserOrderDetail />
               </RequireAuth>
             }
           />

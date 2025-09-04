@@ -150,9 +150,12 @@ const Confirmation = () => {
                     </table>
                   </div>
                   <div className="text-center">
-                    <button className="btn btn-primary">
+                    <Link
+                      to={`/account/orders/details/${order.id}`}
+                      className="btn btn-primary"
+                    >
                       View Order Details
-                    </button>
+                    </Link>
                     <Link to="/" className="btn btn-outline-secondary ms-2">
                       Continue Shopping
                     </Link>
