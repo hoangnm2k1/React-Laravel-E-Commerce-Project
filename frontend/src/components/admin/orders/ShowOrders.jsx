@@ -79,7 +79,7 @@ const ShowOrders = () => {
                             </td>
                             <td>{order.name}</td>
                             <td>{order.email}</td>
-                            <td>{order.quantity}</td>
+                            <td>${order.grand_total}</td>
                             <td>{order.created_at}</td>
                             <td>
                               {order.payment_status == "paid" ? (

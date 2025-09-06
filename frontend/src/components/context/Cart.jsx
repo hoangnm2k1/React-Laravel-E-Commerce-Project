@@ -1,11 +1,15 @@
 import { useState } from "react";
 import { CartContext } from "./CartContext";
 import { set } from "react-hook-form";
+import { useEffect } from "react";
+import { adminToken, apiUrl } from "../common/Http";
 
 export const CartProvider = ({ children }) => {
   const [cartData, setCartData] = useState(
     JSON.parse(localStorage.getItem("cart")) || []
   );
+
+  const [shippingCost, setShippingCost] = useState(0);
 
   const addToCart = (product, size = null) => {
     let updatedCart = [...cartData];
@@ -75,7 +79,11 @@ export const CartProvider = ({ children }) => {
   };
 
   const shipping = () => {
-    return 0;
+    let shippingAmount = 0;
+    cartData.map((item) => {
+      shippingAmount += item.quantity * shippingCost;
+    });
+    return shippingAmount;
   };
 
   const subTotal = () => {
@@ -116,6 +124,24 @@ export const CartProvider = ({ children }) => {
     });
     return totalQuantity;
   };
+
+  useEffect(() => {
+    fetch(`${apiUrl}/get-shipping-front`, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .then((result) => {
+        if (result.status == 200) {
+          setShippingCost(result.shipping.shipping_charge);
+        } else {
+          setShippingCost(0);
+          console.log("Failed to fetch shipping charge");
+        }
+      });
+  }, []);
 
   return (
     <CartContext.Provider
