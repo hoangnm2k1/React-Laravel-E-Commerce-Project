@@ -11,7 +11,6 @@ import Dashboard from "./components/admin/Dashboard";
 import Home from "./components/Home";
 import Login from "./components/admin/Login";
 import Product from "./components/Product";
-import Profile from "./components/Profile";
 import Register from "./components/Register";
 import Shop from "./components/Shop";
 
@@ -31,9 +30,10 @@ import { default as EditProduct } from "./components/admin/product/Edit";
 
 import { default as UserOrderDetail } from "./components/front/OrderDetail";
 
-import ShowOrders from "./components/admin/orders/ShowOrders";
-import OrderDetail from "./components/admin/orders/OrderDetails";
 import MyOrders from "./components/front/MyOrders";
+import OrderDetail from "./components/admin/orders/OrderDetails";
+import Profile from "./components/front/Profile";
+import ShowOrders from "./components/admin/orders/ShowOrders";
 
 function App() {
   return (

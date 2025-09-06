@@ -2,7 +2,6 @@ import { useNavigate } from "react-router-dom";
 import React from "react";
 import Layout from "./common/Layout";
 import { Link } from "react-router-dom";
-import ProductImg from "../assets/images/men/eight.jpg";
 import { useState } from "react";
 import { useContext } from "react";
 import { CartContext } from "./context/CartContext";
@@ -20,8 +19,36 @@ const Checkout = () => {
     register,
     handleSubmit,
     setError,
+    reset,
     formState: { errors },
-  } = useForm();
+  } = useForm({
+    defaultValues: async () => {
+      const result = await fetch(`${apiUrl}/get-profile/`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${userToken()}`,
+        },
+      })
+        .then((res) => res.json())
+        .then((res) => {
+          if (res.status == 200) {
+            reset({
+              name: res.data.name,
+              email: res.data.email,
+              mobile: res.data.mobile,
+              address: res.data.address,
+              city: res.data.city,
+              state: res.data.state,
+              zip: res.data.zip,
+            });
+          } else {
+            console.log(res.message);
+          }
+        });
+    },
+  });
 
   const saveOrder = async (formData, paymentStatus) => {
     const orderData = {
