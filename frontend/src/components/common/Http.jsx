@@ -10,3 +10,6 @@ export const userToken = () => {
   const userData = JSON.parse(data);
   return userData.token;
 };
+
+export const STRIPE_PUBLIC_KEY =
+  "pk_test_51Q3UTvIIpEdWpDiApli3HjsNEIa1DKkdYScbY0xsO35nD32Wleu76Ovrkh1rPoYzroBbTDgDzwvJXKrzHvbothDy00mcVLmKmR";

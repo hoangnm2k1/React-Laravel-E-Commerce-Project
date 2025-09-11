@@ -87,7 +87,12 @@ const Confirmation = () => {
                       )}
                     </p>
                     <p>
-                      <strong>Payment Method: </strong> COD
+                      <strong>Payment Method: </strong>
+                      {order.payment_method == "stripe" ? (
+                        <span className="badge bg-success">Stripe</span>
+                      ) : (
+                        <span className="badge bg-warning">COD</span>
+                      )}
                     </p>
                   </div>
                   <div className="col-6">
@@ -120,8 +125,8 @@ const Confirmation = () => {
                             <tr key={`item-${index}`}>
                               <td>{item.name}</td>
                               <td>{item.quantity}</td>
-                              <td>${item.price}</td>
-                              <td>${item.price * item.quantity}</td>
+                              <td>${item.unit_price}</td>
+                              <td>${item.unit_price * item.quantity}</td>
                             </tr>
                           ))}
                       </tbody>

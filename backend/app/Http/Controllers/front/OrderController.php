@@ -5,9 +5,9 @@ namespace App\Http\Controllers\front;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\OrderItem;
-use App\Models\User;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Stripe\PaymentIntent;
+use Stripe\Stripe;
 
 class OrderController extends Controller
 {
@@ -38,6 +38,7 @@ class OrderController extends Controller
                 'shipping' => $request->shipping,
                 'discount' => $request->discount,
                 'payment_status' => $request->payment_status,
+                'payment_method' => $request->payment_method,
                 'status' => $request->status,
                 'name' => $request->name,
                 'email' => $request->email,
@@ -74,4 +75,38 @@ class OrderController extends Controller
             'message' => 'No items in cart'
         ], 400);
     }
+
+
+    public function createPaymentIntent(Request $request)
+    {
+        try {
+            if ($request->amount > 0) {
+                Stripe::setApiKey(env('STRIPE_SECRET_KEY'));
+
+                $paymentIntent = PaymentIntent::create([
+                    'amount' => $request->amount,
+                    'currency' => 'USD',
+                    'payment_method_types' => ['card'],
+                ]);
+
+                $clientSecret = $paymentIntent->client_secret;
+
+                return response()->json([
+                    'status' => 200,
+                    'client_secret' => $clientSecret
+                ], 200);
+            } else {
+                return response()->json([
+                    'status' => 400,
+                    'message' => 'Invalid amount'
+                ], 400);
+            }
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 500,
+                'message' => 'Payment processing failed: ' . $th->getMessage()
+            ], 500);
+        }
+    }
+
 }

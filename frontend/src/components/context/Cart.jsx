@@ -89,7 +89,7 @@ export const CartProvider = ({ children }) => {
   const subTotal = () => {
     let subTotal = 0;
     cartData.map((item) => {
-      subTotal += item.price * item.quantity;
+      subTotal += parseFloat(item.price) * parseInt(item.quantity);
     });
 
     return subTotal;

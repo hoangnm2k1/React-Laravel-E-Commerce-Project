@@ -13,6 +13,7 @@ class Order extends Model
         'shipping',
         'discount',
         'payment_status',
+        'payment_method',
         'status',
         'name',
         'email',

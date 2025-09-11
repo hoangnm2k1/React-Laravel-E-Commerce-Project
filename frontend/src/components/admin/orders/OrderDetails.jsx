@@ -149,7 +149,13 @@ const OrderDetail = () => {
                             <div className="text-secondary pt-5">
                               Payment Method
                             </div>
-                            <div>COD</div>
+                            <div>
+                              {order.payment_method == "stripe" ? (
+                                <span className="badge bg-success">Stripe</span>
+                              ) : (
+                                <span className="badge bg-warning">COD</span>
+                              )}
+                            </div>
                           </div>
                         </div>
                         {items && (

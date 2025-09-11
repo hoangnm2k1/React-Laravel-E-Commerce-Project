@@ -12,6 +12,7 @@ use App\Http\Controllers\front\AccountController;
 use App\Http\Controllers\front\OrderController;
 use App\Http\Controllers\front\ProductController as FrontProductController;
 use App\Http\Controllers\front\ShippingController;
+use App\Models\Order;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/admin/login', [AuthController::class, 'authenticate']);
@@ -32,6 +33,7 @@ Route::group(['middleware' => ['auth:sanctum', 'checkUserRole']], function () {
     Route::get('/get-orders', [AccountController::class, 'getOrders']);
     Route::get('/get-profile', [AccountController::class, 'getProfile']);
     Route::post('/update-profile', [AccountController::class, 'updateProfile']);
+    Route::post('/create-payment-intent', [OrderController::class, 'createPaymentIntent']);
 });
 
 
