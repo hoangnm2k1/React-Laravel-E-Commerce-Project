@@ -5,6 +5,7 @@ A full-stack e-commerce application built with Laravel (backend) and React (fron
 ## 🚀 Features
 
 - **Backend (Laravel 11)**
+
   - RESTful API
   - Authentication with Laravel Sanctum
   - Image processing with Intervention Image
@@ -106,6 +107,7 @@ composer run dev
 ```
 
 This command will start:
+
 - Laravel development server (http://localhost:8000)
 - Queue worker
 - Log viewer (Pail)
@@ -114,26 +116,16 @@ This command will start:
 ### Option 2: Manual Setup
 
 **Terminal 1 - Backend:**
+
 ```bash
 cd backend
 php artisan serve
 ```
 
-**Terminal 2 - Queue Worker (optional):**
-```bash
-cd backend
-php artisan queue:work
-```
+**Terminal 2 - Frontend:**
 
-**Terminal 3 - Frontend:**
 ```bash
 cd frontend
-npm run dev
-```
-
-**Terminal 4 - Backend Assets (if needed):**
-```bash
-cd backend
 npm run dev
 ```
 
@@ -154,29 +146,6 @@ cd backend
 php artisan migrate
 ```
 
-### Seeding Data (if available)
-
-```bash
-cd backend
-php artisan db:seed
-```
-
-## 🧪 Testing
-
-### Backend Tests
-
-```bash
-cd backend
-php artisan test
-```
-
-### Frontend Tests
-
-```bash
-cd frontend
-npm run test
-```
-
 ## 📦 Building for Production
 
 ### Backend
@@ -195,37 +164,6 @@ npm run build
 ```bash
 cd frontend
 npm run build
-```
-
-## 🔧 Common Commands
-
-### Backend (Laravel)
-
-```bash
-# Clear all caches
-php artisan optimize:clear
-
-# Create a new controller
-php artisan make:controller ProductController
-
-# Create a new model with migration
-php artisan make:model Product -m
-
-# Run specific migration
-php artisan migrate --path=/database/migrations/specific_migration.php
-
-# Create storage link
-php artisan storage:link
-```
-
-### Frontend (React)
-
-```bash
-# Lint code
-npm run lint
-
-# Preview production build
-npm run preview
 ```
 
 ## 📁 Project Structure
@@ -265,42 +203,3 @@ headers: {
 2. Get your publishable and secret keys
 3. Add them to your `.env` file
 4. Test with Stripe's test card numbers
-
-## 🐛 Troubleshooting
-
-### Common Issues
-
-1. **Permission errors**: Ensure storage and cache directories are writable
-   ```bash
-   chmod -R 775 storage bootstrap/cache
-   ```
-
-2. **Database connection errors**: Check your `.env` database configuration
-
-3. **Composer memory limit**: Increase PHP memory limit
-   ```bash
-   php -d memory_limit=2G composer install
-   ```
-
-4. **Node.js version issues**: Use Node.js >= 18.0
-
-### Logs
-
-- **Laravel logs**: `backend/storage/logs/laravel.log`
-- **Browser console**: Check for JavaScript errors
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Run tests
-5. Submit a pull request
-
-## 📄 License
-
-This project is licensed under the MIT License.
-
-## 📞 Support
-
-For support, please contact [your-email@example.com] or create an issue in the repository.
