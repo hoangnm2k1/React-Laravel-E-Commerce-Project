@@ -3,18 +3,25 @@
 namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Category;
+use App\Services\Interfaces\ICategoryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class CategoryController extends Controller
 {
+    protected $categoryService;
+
+    public function __construct(ICategoryService $categoryService)
+    {
+        $this->categoryService = $categoryService;
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $categories = Category::orderBy('created_at', 'DESC')->get();
+        $categories = $this->categoryService->getAllCategories();
         return response()->json([
             'status' => 200,
             'data' => $categories,
@@ -46,7 +53,7 @@ class CategoryController extends Controller
             ], 400);
         }
 
-        $category = Category::create([
+        $category = $this->categoryService->createCategory([
             'name' => $request->name,
             'status' => $request->status,
         ]);
@@ -63,7 +70,7 @@ class CategoryController extends Controller
      */
     public function show(string $id)
     {
-        $category = Category::find($id);
+        $category = $this->categoryService->getCategoryById($id);
 
         if (!$category) {
             return response()->json([
@@ -92,15 +99,6 @@ class CategoryController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $category = Category::find($id);
-
-        if (!$category) {
-            return response()->json([
-                'status' => 404,
-                'message' => 'Category not found',
-            ], 404);
-        }
-
         $validator = Validator::make($request->all(), [
             'name' => 'required',
             'status' => 'nullable|boolean',
@@ -113,10 +111,17 @@ class CategoryController extends Controller
             ], 400);
         }
 
-        $category->update([
+        $category = $this->categoryService->updateCategory($id, [
             'name' => $request->name,
             'status' => $request->status,
         ]);
+
+        if (!$category) {
+            return response()->json([
+                'status' => 404,
+                'message' => 'Category not found',
+            ], 404);
+        }
 
         return response()->json([
             'status' => 200,
@@ -130,16 +135,14 @@ class CategoryController extends Controller
      */
     public function destroy(string $id)
     {
-        $category = Category::find($id);
+        $deleted = $this->categoryService->deleteCategory($id);
 
-        if (!$category) {
+        if (!$deleted) {
             return response()->json([
                 'status' => 404,
                 'message' => 'Category not found',
             ], 404);
         }
-
-        $category->delete();
 
         return response()->json([
             'status' => 200,
