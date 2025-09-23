@@ -3,18 +3,25 @@
 namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Brand;
+use App\Services\Interfaces\IBrandService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class BrandController extends Controller
 {
+    protected $brandService;
+
+    public function __construct(IBrandService $brandService)
+    {
+        $this->brandService = $brandService;
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $brands = Brand::orderBy('created_at', 'DESC')->get();
+        $brands = $this->brandService->getAllBrands();
         return response()->json([
             'status' => 200,
             'data' => $brands,
@@ -45,7 +52,7 @@ class BrandController extends Controller
             ], 400);
         }
 
-        $brand = Brand::create([
+        $brand = $this->brandService->createBrand([
             'name' => $request->name,
             'status' => $request->status,
         ]);
@@ -62,7 +69,7 @@ class BrandController extends Controller
      */
     public function show(string $id)
     {
-        $brand = Brand::find($id);
+        $brand = $this->brandService->getBrandById($id);
 
         if (!$brand) {
             return response()->json([
@@ -91,15 +98,6 @@ class BrandController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $brand = Brand::find($id);
-
-        if (!$brand) {
-            return response()->json([
-                'status' => 404,
-                'message' => 'Brand not found',
-            ], 404);
-        }
-
         $validator = Validator::make($request->all(), [
             'name' => 'required',
             'status' => 'nullable|boolean',
@@ -112,10 +110,17 @@ class BrandController extends Controller
             ], 400);
         }
 
-        $brand->update([
+        $brand = $this->brandService->updateBrand($id, [
             'name' => $request->name,
             'status' => $request->status,
         ]);
+
+        if (!$brand) {
+            return response()->json([
+                'status' => 404,
+                'message' => 'Brand not found',
+            ], 404);
+        }
 
         return response()->json([
             'status' => 200,
@@ -129,16 +134,14 @@ class BrandController extends Controller
      */
     public function destroy(string $id)
     {
-        $brand = Brand::find($id);
+        $deleted = $this->brandService->deleteBrand($id);
 
-        if (!$brand) {
+        if (!$deleted) {
             return response()->json([
                 'status' => 404,
                 'message' => 'Brand not found',
             ], 404);
         }
-
-        $brand->delete();
 
         return response()->json([
             'status' => 200,

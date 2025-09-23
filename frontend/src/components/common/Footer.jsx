@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import LogoWhite from "../../assets/images/logo-white.png";
 
 const Footer = () => {
@@ -16,13 +17,13 @@ const Footer = () => {
             <h2 className="mb-3">Categories</h2>
             <ul>
               <li>
-                <a href="">Kids</a>
+                <Link to="/shop?category=1">Kids</Link>
               </li>
               <li>
-                <a href="">Men</a>
+                <Link to="/shop?category=3">Men</Link>
               </li>
               <li>
-                <a href="">Women</a>
+                <Link to="/shop?category=2">Women</Link>
               </li>
             </ul>
           </div>
@@ -30,10 +31,10 @@ const Footer = () => {
             <h2 className="mb-3">Quick Links</h2>
             <ul>
               <li>
-                <a href="">Login</a>
+                <Link to="/account/login">Login</Link>
               </li>
               <li>
-                <a href="">Register</a>
+                <Link to="/account/register">Register</Link>
               </li>
             </ul>
           </div>
@@ -41,10 +42,10 @@ const Footer = () => {
             <h2 className="mb-3">Get In Touch</h2>
             <ul>
               <li>
-                <a href="#">070XXXXXXX</a>
+                <a href="tel:070XXXXXXX">070XXXXXXX</a>
               </li>
               <li>
-                <a href="#">name@gmail.com</a>
+                <a href="mailto:name@gmail.com">name@gmail.com</a>
               </li>
             </ul>
           </div>
