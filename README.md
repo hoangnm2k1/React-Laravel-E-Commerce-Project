@@ -1,205 +1,117 @@
-# E-commerce Application
+E-commerce Application
 
-A full-stack e-commerce application built with Laravel (backend) and React (frontend), featuring Stripe payment integration.
+Full-stack e-commerce app với Laravel 11 (backend) và React 19 (frontend), tích hợp thanh toán Stripe.
 
-## 🚀 Features
+🚀 Tính năng
 
-- **Backend (Laravel 11)**
+Backend (Laravel)
 
-  - RESTful API
-  - Authentication with Laravel Sanctum
-  - Image processing with Intervention Image
-  - Stripe payment integration
-  - SQLite database (default)
-  - Queue system for background jobs
+RESTful API, Sanctum Auth, Queue jobs
 
-- **Frontend (React 19)**
-  - Modern React with Vite
-  - Bootstrap UI components
-  - Stripe payment integration
-  - Rich text editor (Jodit)
-  - Star rating system
-  - Toast notifications
-  - Swiper carousel
+Stripe, SQLite, Image processing (Intervention Image)
 
-## 📋 Prerequisites
+Frontend (React)
 
-- **PHP** >= 8.2
-- **Composer** >= 2.0
-- **Node.js** >= 18.0
-- **npm** or **yarn**
+React + Vite, Bootstrap UI
 
-## 🛠️ Installation
+Stripe, Rich text editor (Jodit), Rating, Carousel, Toasts
 
-### 1. Clone the Repository
+📋 Yêu cầu
 
-```bash
+PHP ≥ 8.2, Composer ≥ 2
+
+Node.js ≥ 18, npm/yarn
+
+🛠️ Cài đặt
 git clone <repository-url>
 cd ecommerce
-```
 
-### 2. Backend Setup (Laravel)
-
-```bash
+Backend
 cd backend
-
-# Install PHP dependencies
 composer install
-
-# Copy environment file
-copy .env.example .env
-
-# Generate application key
+cp .env.example .env
 php artisan key:generate
-
-# Create SQLite database (if not exists)
 php -r "file_exists('database/database.sqlite') || touch('database/database.sqlite');"
-
-# Run database migrations
 php artisan migrate
-
-# Install Node.js dependencies for asset compilation
 npm install
-```
 
-### 3. Frontend Setup (React)
-
-```bash
+Frontend
 cd ../frontend
-
-# Install dependencies
 npm install
-```
 
-### 4. Environment Configuration
-
-Edit `backend/.env` file and configure the following:
-
-```env
-APP_NAME="Your E-commerce App"
+Cấu hình .env (backend)
 APP_URL=http://localhost:8000
-
-# Database (SQLite is pre-configured)
 DB_CONNECTION=sqlite
-
-# Stripe Configuration (add your keys)
 STRIPE_KEY=your_stripe_publishable_key
 STRIPE_SECRET=your_stripe_secret_key
 
-# Mail Configuration (optional)
-MAIL_MAILER=smtp
-MAIL_HOST=your_smtp_host
-MAIL_PORT=587
-MAIL_USERNAME=your_email
-MAIL_PASSWORD=your_password
-```
+🚀 Chạy ứng dụng
 
-## 🚀 Running the Application
+Cách nhanh nhất:
 
-### Option 1: Development Mode (Recommended)
-
-Run both backend and frontend simultaneously:
-
-```bash
-# In the backend directory
 cd backend
 composer run dev
-```
 
-This command will start:
+Bao gồm: Laravel server, queue worker, log viewer, Vite server.
 
-- Laravel development server (http://localhost:8000)
-- Queue worker
-- Log viewer (Pail)
-- Vite development server
+Thủ công:
 
-### Option 2: Manual Setup
+Backend: php artisan serve
 
-**Terminal 1 - Backend:**
+Queue worker: php artisan queue:work
 
-```bash
-cd backend
-php artisan serve
-```
+Frontend: npm run dev (trong thư mục frontend)
 
-**Terminal 2 - Frontend:**
+📱 Đường dẫn
 
-```bash
-cd frontend
-npm run dev
-```
+Frontend: http://localhost:5173
 
-## 📱 Access Points
+Backend API: http://localhost:8000
 
-- **Frontend Application**: http://localhost:5173
-- **Backend API**: http://localhost:8000
-- **API Documentation**: http://localhost:8000/api
+🧪 Testing
 
-## 🗄️ Database
+# Backend
 
-The application uses SQLite by default. The database file is located at `backend/database/database.sqlite`.
+cd backend && php artisan test
 
-### Running Migrations
+# Frontend
 
-```bash
-cd backend
-php artisan migrate
-```
+cd frontend && npm run test
 
-## 📦 Building for Production
+📦 Build Production
 
-### Backend
+# Backend
 
-```bash
 cd backend
 composer install --optimize-autoloader --no-dev
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
+php artisan config:cache route:cache view:cache
 npm run build
-```
 
-### Frontend
+# Frontend
 
-```bash
 cd frontend
 npm run build
-```
 
-## 📁 Project Structure
-
-```
+📁 Cấu trúc
 ecommerce/
-├── backend/                 # Laravel application
-│   ├── app/                # Application logic
-│   ├── config/             # Configuration files
-│   ├── database/           # Migrations, seeders, factories
-│   ├── public/             # Public assets
-│   ├── resources/          # Views, CSS, JS
-│   ├── routes/             # Route definitions
-│   └── storage/            # File storage
-├── frontend/               # React application
-│   ├── src/                # Source code
-│   │   ├── components/     # React components
-│   │   └── assets/         # Static assets
-│   └── public/             # Public files
-└── README.md              # This file
-```
+├── backend/ # Laravel app
+└── frontend/ # React app
 
-## 🔐 API Authentication
+🔐 API Auth
 
-The API uses Laravel Sanctum for authentication. Include the token in your requests:
+Dùng Sanctum, gửi token trong header:
 
-```javascript
 headers: {
-  'Authorization': 'Bearer your-token-here',
-  'Content-Type': 'application/json'
+Authorization: "Bearer your-token",
+"Content-Type": "application/json"
 }
-```
 
-## 💳 Stripe Integration
+💳 Stripe
 
-1. Create a Stripe account at https://stripe.com
-2. Get your publishable and secret keys
-3. Add them to your `.env` file
-4. Test with Stripe's test card numbers
+Đăng ký tại stripe.com
+
+Lấy publishable + secret keys
+
+Thêm vào .env
+
+> > > > > > > 02cdbcb319d16bbf9ad364b5a8dd313f90477fcb
