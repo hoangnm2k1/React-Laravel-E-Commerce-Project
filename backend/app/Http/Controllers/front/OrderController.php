@@ -3,17 +3,21 @@
 namespace App\Http\Controllers\front;
 
 use App\Http\Controllers\Controller;
-use App\Models\Order;
-use App\Models\OrderItem;
+use App\Services\Interfaces\IOrderService;
 use Illuminate\Http\Request;
-use Stripe\PaymentIntent;
-use Stripe\Stripe;
 
 class OrderController extends Controller
 {
+    protected $orderService;
+
+    public function __construct(IOrderService $orderService)
+    {
+        $this->orderService = $orderService;
+    }
+
     public function getOrder($id)
     {
-        $order = Order::with('orderItems')->where('id', $id)->first();
+        $order = $this->orderService->getOrderWithItems($id);
 
         if ($order) {
             return response()->json([
@@ -31,7 +35,7 @@ class OrderController extends Controller
     public function saveOrder(Request $request)
     {
         if (!empty($request->cart)) {
-            $order = Order::create([
+            $orderData = [
                 'user_id' => $request->user()->id,
                 'subtotal' => $request->subtotal,
                 'grand_total' => $request->grand_total,
@@ -47,26 +51,15 @@ class OrderController extends Controller
                 'city' => $request->city,
                 'state' => $request->state,
                 'zip' => $request->zip
-            ]);
+            ];
 
-            $orderItems = [];
-            foreach ($request->cart as $item) {
-                $orderItems[] = OrderItem::create([
-                    'order_id' => $order->id,
-                    'product_id' => $item['productId'],
-                    'name' => $item['title'],
-                    'size' => $item['size'],
-                    'price' => $item['quantity'] * $item['price'],
-                    'unit_price' => $item['price'],
-                    'quantity' => $item['quantity']
-                ]);
-            }
+            $result = $this->orderService->createOrder($orderData, $request->cart);
 
             return response()->json([
                 'status' => 200,
                 'message' => 'Order placed successfully',
-                'order' => $order,
-                'order_items' => $orderItems
+                'order' => $result['order'],
+                'order_items' => $result['order_items']
             ], 200);
         }
 
@@ -80,32 +73,17 @@ class OrderController extends Controller
     public function createPaymentIntent(Request $request)
     {
         try {
-            if ($request->amount > 0) {
-                Stripe::setApiKey(env('STRIPE_SECRET_KEY'));
+            $clientSecret = $this->orderService->createPaymentIntent($request->amount);
 
-                $paymentIntent = PaymentIntent::create([
-                    'amount' => $request->amount,
-                    'currency' => 'USD',
-                    'payment_method_types' => ['card'],
-                ]);
-
-                $clientSecret = $paymentIntent->client_secret;
-
-                return response()->json([
-                    'status' => 200,
-                    'client_secret' => $clientSecret
-                ], 200);
-            } else {
-                return response()->json([
-                    'status' => 400,
-                    'message' => 'Invalid amount'
-                ], 400);
-            }
-        } catch (\Throwable $th) {
             return response()->json([
-                'status' => 500,
-                'message' => 'Payment processing failed: ' . $th->getMessage()
-            ], 500);
+                'status' => 200,
+                'client_secret' => $clientSecret
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => $e->getMessage() === 'Invalid amount' ? 400 : 500,
+                'message' => 'Payment processing failed: ' . $e->getMessage()
+            ], $e->getMessage() === 'Invalid amount' ? 400 : 500);
         }
     }
 

@@ -3,13 +3,20 @@
 namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Order;
+use App\Services\Interfaces\IOrderService;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
+    protected $orderService;
+
+    public function __construct(IOrderService $orderService)
+    {
+        $this->orderService = $orderService;
+    }
+
     public function index() {
-        $orders = Order::orderBy('created_at', 'desc')->get();
+        $orders = $this->orderService->getAllOrders();
 
         return response()->json([
             'orders' => $orders,
@@ -18,7 +25,7 @@ class OrderController extends Controller
     }
 
     public function show($id) {
-        $order = Order::with('orderItems', 'orderItems.product')->find($id);
+        $order = $this->orderService->getOrderWithItems($id);
 
         if (!$order) {
             return response()->json([
@@ -34,7 +41,10 @@ class OrderController extends Controller
     }
 
     public function updateOrder(Request $request, $id) {
-        $order = Order::find($id);
+        $order = $this->orderService->updateOrder($id, [
+            'status' => $request->status,
+            'payment_status' => $request->payment_status
+        ]);
 
         if (!$order) {
             return response()->json([
@@ -42,10 +52,6 @@ class OrderController extends Controller
                 'message' => 'Order not found'
             ], 404);
         }
-
-        $order->status = $request->status;
-        $order->payment_status = $request->payment_status;
-        $order->save();
 
         return response()->json([
             'status' => 200,

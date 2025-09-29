@@ -97,6 +97,7 @@ class AccountController extends Controller
 
     public function getOrders(Request $request) {
         $orders = Order::where('user_id', $request->user()->id)
+        ->orderBy('id', 'DESC')
         ->get();
 
         return response()->json([
