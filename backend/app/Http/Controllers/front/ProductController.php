@@ -3,29 +3,34 @@
 namespace App\Http\Controllers\front;
 
 use App\Http\Controllers\Controller;
-use App\Models\Brand;
-use App\Models\Category;
-use App\Models\Product;
+use App\Services\Interfaces\IProductService;
+use App\Services\Interfaces\IBrandService;
+use App\Services\Interfaces\ICategoryService;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
+    protected $productService;
+    protected $brandService;
+    protected $categoryService;
+
+    public function __construct(
+        IProductService $productService,
+        IBrandService $brandService,
+        ICategoryService $categoryService
+    ) {
+        $this->productService = $productService;
+        $this->brandService = $brandService;
+        $this->categoryService = $categoryService;
+    }
+
     public function getProducts(Request $request)
     {
-        $products = Product::latest()->where('status', 1);
+        $filters = [];
+        if ($request->category) $filters['category'] = $request->category;
+        if ($request->brand) $filters['brand'] = $request->brand;
 
-        if (!empty($request->category)) {
-            $categoryIdArray = explode(',', $request->category);
-            $products = $products->whereIn('category_id', $categoryIdArray);
-        }
-
-        if (!empty($request->brand)) {
-            $brandIdArray = explode(',', $request->brand);
-            $products = $products->whereIn('brand_id', $brandIdArray);
-        }
-
-
-        $products = $products->get();
+        $products = $this->productService->getActiveProducts($filters);
 
         return response()->json([
             'status' => 200,
@@ -35,7 +40,7 @@ class ProductController extends Controller
 
     public function getLatestProducts()
     {
-        $latestProducts = Product::latest()->where('status', 1)->take(8)->get();
+        $latestProducts = $this->productService->getLatestProducts();
 
         return response()->json([
             'status' => 200,
@@ -45,7 +50,7 @@ class ProductController extends Controller
 
     public function getFeaturedProducts()
     {
-        $featuredProducts = Product::latest()->where('status', 1)->where('is_featured', 'yes')->take(8)->get();
+        $featuredProducts = $this->productService->getFeaturedProducts();
 
         return response()->json([
             'status' => 200,
@@ -55,29 +60,29 @@ class ProductController extends Controller
 
     public function getCategories()
     {
-        $categories = Category::orderBy('name', 'asc')->where('status', 1)->get();
+        $categories = $this->categoryService->getAllCategories()->where('status', 1);
 
         return response()->json([
             'status' => 200,
-            'data' => $categories
+            'data' => $categories->values()
         ], 200);
     }
 
     public function getBrands()
     {
-        $brands = Brand::orderBy('name', 'asc')->where('status', 1)->get();
+        $brands = $this->brandService->getAllBrands()->where('status', 1);
 
         return response()->json([
             'status' => 200,
-            'data' => $brands
+            'data' => $brands->values()
         ], 200);
     }
 
     public function getProductDetails($id)
     {
-        $product = Product::with(['productSizes.size', 'productImages'])->find($id);
+        $result = $this->productService->getProductWithDetails($id);
 
-        if ($product == null) {
+        if (!$result) {
             return response()->json([
                 'status' => 404,
                 'message' => 'Product not found'
@@ -86,7 +91,7 @@ class ProductController extends Controller
 
         return response()->json([
             'status' => 200,
-            'data' => $product
+            'data' => $result['product']
         ], 200);
     }
 }

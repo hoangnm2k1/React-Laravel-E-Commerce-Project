@@ -3,26 +3,29 @@
 namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Product;
-use App\Models\ProductImage;
-use App\Models\ProductSize;
-use App\Models\TempImage;
+use App\Services\Interfaces\IProductService;
+use App\Services\Interfaces\IProductImageService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
-use Intervention\Image\ImageManager;
-use Intervention\Image\Drivers\Gd\Driver;
 
 class ProductController extends Controller
 {
+    protected $productService;
+    protected $imageService;
+
+    public function __construct(IProductService $productService, IProductImageService $imageService)
+    {
+        $this->productService = $productService;
+        $this->imageService = $imageService;
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $products = Product::with('productImages', 'productSizes')->orderBy('created_at', 'DESC')->get();
+        $products = $this->productService->getAllProducts();
         return response()->json([
             'status' => 200,
             'data' => $products,
@@ -58,65 +61,26 @@ class ProductController extends Controller
             ], 400);
         }
 
-        $product = new Product();
-        $product->title = $request->title;
-        $product->price = $request->price;
-        $product->compare_price = $request->compare_price;
-        $product->description = $request->description;
-        $product->short_description = $request->short_description;
-        $product->image = $request->image;
-        $product->brand_id = $request->brand_id;
-        $product->category_id = $request->category_id;
-        $product->quantity = $request->quantity;
-        $product->sku = $request->sku;
-        $product->barcode = $request->barcode;
-        $product->status = $request->status;
-        $product->is_featured = $request->is_featured;
-        $product->save();
+        $productData = [
+            'title' => $request->title,
+            'price' => $request->price,
+            'compare_price' => $request->compare_price,
+            'description' => $request->description,
+            'short_description' => $request->short_description,
+            'brand_id' => $request->brand_id,
+            'category_id' => $request->category_id,
+            'quantity' => $request->quantity,
+            'sku' => $request->sku,
+            'barcode' => $request->barcode,
+            'status' => $request->status,
+            'is_featured' => $request->is_featured,
+        ];
 
-        // $product = Product::create($request->all());
-
-    if (!empty($request->sizes)) {
-        foreach ($request->sizes as $sizeId) {
-            ProductSize::create([
-                'product_id' => $product->id,
-                'size_id' => $sizeId
-            ]);
-        }
-    }
-
-    if ($request->gallery) {
-        foreach ($request->gallery as $key => $tempImageId) {
-            $tempImage = TempImage::find($tempImageId);
-
-            $extArray = explode('.', $tempImage->name);
-            $ext = end($extArray);
-            $rand = rand(1000, 9999);
-            $imageName = $product->id. '-'. $rand . time() . '.' . $ext;
-
-            //large thumbnail
-            $manager = new ImageManager(Driver::class);
-            $img = $manager->read(public_path('uploads/temp/' . $tempImage->name));
-            $img->scaleDown(1200);
-            $img->save(public_path('uploads/products/large/' . $imageName));
-
-            //small thumbnail
-            $manager = new ImageManager(Driver::class);
-            $img = $manager->read(public_path('uploads/temp/' . $tempImage->name));
-            $img->coverDown(400, 460);
-            $img->save(public_path('uploads/products/small/' . $imageName));
-
-            ProductImage::create([
-                'image' => $imageName,
-                'product_id' => $product->id
-            ]);
-
-            if ($key == 0) {
-                $product->image = $imageName;
-                $product->save();
-            }
-        }
-    }
+        $product = $this->productService->createProduct(
+            $productData,
+            $request->sizes ?? [],
+            $request->gallery ?? []
+        );
 
         return response()->json([
             'status' => 200,
@@ -130,9 +94,9 @@ class ProductController extends Controller
      */
     public function show(string $id)
     {
-        $product = Product::with('productImages', 'productSizes')->find($id);
+        $result = $this->productService->getProductWithDetails($id);
 
-        if (!$product) {
+        if (!$result) {
             return response()->json([
                 'status' => 404,
                 'message' => 'Product not found',
@@ -140,12 +104,10 @@ class ProductController extends Controller
             ], 404);
         }
 
-        $productSizes = $product->productSizes()->pluck('size_id');
-
         return response()->json([
             'status' => 200,
-            'data' => $product,
-            'productSizes' => $productSizes
+            'data' => $result['product'],
+            'productSizes' => $result['productSizes']
         ], 200);
     }
 
@@ -162,15 +124,6 @@ class ProductController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $product = Product::find($id);
-
-        if (!$product) {
-            return response()->json([
-                'status' => 404,
-                'message' => 'Product not found',
-            ], 404);
-        }
-
         $validator = Validator::make($request->all(), [
             'title' => 'required',
             'price' => 'required|numeric',
@@ -190,30 +143,28 @@ class ProductController extends Controller
             ], 400);
         }
 
-        // $product->update($request->all());
-        $product->title = $request->title;
-        $product->price = $request->price;
-        $product->compare_price = $request->compare_price;
-        $product->description = $request->description;
-        $product->short_description = $request->short_description;
-        // $product->image = $request->image;
-        $product->brand_id = $request->brand_id;
-        $product->category_id = $request->category_id;
-        $product->quantity = $request->quantity;
-        $product->sku = $request->sku;
-        $product->barcode = $request->barcode;
-        $product->status = $request->status;
-        $product->is_featured = $request->is_featured;
-        $product->save();
+        $productData = [
+            'title' => $request->title,
+            'price' => $request->price,
+            'compare_price' => $request->compare_price,
+            'description' => $request->description,
+            'short_description' => $request->short_description,
+            'brand_id' => $request->brand_id,
+            'category_id' => $request->category_id,
+            'quantity' => $request->quantity,
+            'sku' => $request->sku,
+            'barcode' => $request->barcode,
+            'status' => $request->status,
+            'is_featured' => $request->is_featured,
+        ];
 
-        if (!empty($request->sizes)) {
-            ProductSize::where('product_id', $product->id)->delete();
-            foreach ($request->sizes as $sizeId) {
-                ProductSize::create([
-                    'product_id' => $product->id,
-                    'size_id' => $sizeId
-                ]);
-            }
+        $product = $this->productService->updateProduct($id, $productData, $request->sizes ?? []);
+
+        if (!$product) {
+            return response()->json([
+                'status' => 404,
+                'message' => 'Product not found',
+            ], 404);
         }
 
         return response()->json([
@@ -228,23 +179,14 @@ class ProductController extends Controller
      */
     public function destroy(string $id)
     {
-        $product = Product::with('productImages')->find($id);
+        $deleted = $this->productService->deleteProduct($id);
 
-        if (!$product) {
+        if (!$deleted) {
             return response()->json([
                 'status' => 404,
                 'message' => 'Product not found',
             ], 404);
         }
-
-        if ($product->productImages) {
-            foreach ($product->productImages as $image) {
-                File::delete(public_path('uploads/products/large/' . $image->image));
-                File::delete(public_path('uploads/products/small/' . $image->image));
-            }
-        }
-
-        $product->delete();
 
         return response()->json([
             'status' => 200,
@@ -265,26 +207,10 @@ class ProductController extends Controller
             ], 400);
         }
 
-        $image = $request->file('image');
-        $imageName = $request->product_id . '-' . time() . '.' . $image->extension();
-
-        //large thumbnail
-        $manager = new ImageManager(Driver::class);
-        $img = $manager->read($image->getPathname());
-        $img->scaleDown(1200);
-        $img->save(public_path('uploads/products/large/' . $imageName));
-
-        //small thumbnail
-        $manager = new ImageManager(Driver::class);
-        $img = $manager->read($image->getPathname());
-        $img->coverDown(400, 460);
-        $img->save(public_path('uploads/products/small/' . $imageName));
-
-        //create product image
-        $productImage = ProductImage::create([
-            'image' => $imageName,
-            'product_id' => $request->product_id
-        ]);
+        $productImage = $this->imageService->saveProductImage(
+            $request->product_id,
+            $request->file('image')
+        );
 
         return response()->json([
             'status' => 200,
@@ -295,34 +221,24 @@ class ProductController extends Controller
 
     public function updateDefaultImage(Request $request)
     {
-        $product = Product::find($request->product_id);
-        $product->image = $request->image;
-        $product->save();
+        $this->imageService->updateDefaultImage($request->product_id, $request->image);
 
         return response()->json([
             'status' => 200,
-            'message' => 'Default image updated successfully',
-            'data' => $product
+            'message' => 'Default image updated successfully'
         ], 200);
     }
 
     public function deleteProductImage(Request $request)
     {
-        $productImage = ProductImage::find($request->id);
+        $deleted = $this->imageService->deleteProductImage($request->id);
 
-        if (!$productImage) {
+        if (!$deleted) {
             return response()->json([
                 'status' => 404,
                 'message' => 'Product image not found',
             ], 404);
         }
-
-        // Delete the image files
-        File::delete(public_path('uploads/products/large/' . $productImage->image));
-        File::delete(public_path('uploads/products/small/' . $productImage->image));
-
-        // Delete the product image record
-        $productImage->delete();
 
         return response()->json([
             'status' => 200,

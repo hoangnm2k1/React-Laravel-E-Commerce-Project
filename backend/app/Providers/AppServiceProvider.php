@@ -15,6 +15,12 @@ use App\Repositories\Interfaces\IOrderRepository;
 use App\Repositories\OrderRepository;
 use App\Services\Interfaces\IOrderService;
 use App\Services\OrderService;
+use App\Repositories\Interfaces\IProductRepository;
+use App\Repositories\ProductRepository;
+use App\Services\Interfaces\IProductService;
+use App\Services\ProductService;
+use App\Services\Interfaces\IProductImageService;
+use App\Services\ProductImageService;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -29,6 +35,9 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ICategoryService::class, CategoryService::class);
         $this->app->bind(IOrderRepository::class, OrderRepository::class);
         $this->app->bind(IOrderService::class, OrderService::class);
+        $this->app->bind(IProductRepository::class, ProductRepository::class);
+        $this->app->bind(IProductService::class, ProductService::class);
+        $this->app->bind(IProductImageService::class, ProductImageService::class);
     }
 
     /**

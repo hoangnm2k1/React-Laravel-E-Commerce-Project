@@ -42,6 +42,35 @@ class TempImageController extends Controller
             'message' => 'Image uploaded successfully',
             'data' => $tempImage
         ], 200);
+    }
 
+    public function delete($image)
+    {
+        $imageName = $image;
+        $deletedImage = TempImage::where('name', $imageName)->first();
+
+        if (!$deletedImage) {
+            return response()->json([
+                'status' => 404,
+                'message' => 'Image not found'
+            ], 404);
+        }
+
+        $deletedImage->delete();
+
+        $mainImagePath = public_path('uploads/temp/' . $imageName);
+        if (file_exists($mainImagePath)) {
+            unlink($mainImagePath);
+        }
+
+        $thumbnailPath = public_path('uploads/temp/thumbnail/' . $imageName);
+        if (file_exists($thumbnailPath)) {
+            unlink($thumbnailPath);
+        }
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Temporary image deleted successfully'
+        ], 200);
     }
 }

@@ -8,7 +8,6 @@ import { adminToken, apiUrl } from "../../common/Http";
 import { toast } from "react-toastify";
 import { useEffect } from "react";
 import JoditEditor from "jodit-react";
-import { Placeholder } from "react-bootstrap";
 
 const Create = ({ placeholder }) => {
   const editor = useRef(null);
@@ -127,9 +126,38 @@ const Create = ({ placeholder }) => {
       });
   };
 
-  const deleteImage = (image) => {
-    const newGallery = galleryImages.filter((img) => img !== image);
-    setGalleryImages(newGallery);
+  const deleteImage = async (image) => {
+    const imageName = image.split("/").pop();
+    console.log('Deleting image:', imageName);
+
+    try {
+      const response = await fetch(`${apiUrl}/temp-images/${imageName}`, {
+        method: "DELETE",
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${adminToken()}`,
+        },
+      });
+      
+      const result = await response.json();
+      console.log('Delete response:', result);
+      
+      if (result.status === 200) {
+        const imageIndex = galleryImages.indexOf(image);
+        const newGallery = galleryImages.filter((img) => img !== image);
+        const newGalleryIds = gallery.filter((_, index) => index !== imageIndex);
+        
+        setGalleryImages(newGallery);
+        setGallery(newGalleryIds);
+        toast.success('Image deleted successfully');
+      } else {
+        console.error('Delete failed:', result);
+        toast.error('Failed to delete image');
+      }
+    } catch (error) {
+      console.error('Delete error:', error);
+      toast.error('Error deleting image');
+    }
   };
 
   const fetchSizes = async () => {
@@ -464,8 +492,12 @@ const Create = ({ placeholder }) => {
                               <img src={image} alt="" className="w-100" />
                             </div>
                             <button
+                              type="button"
                               className="btn btn-danger mt-3 w-100"
-                              onClick={() => deleteImage(image)}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                deleteImage(image);
+                              }}
                             >
                               Delete
                             </button>

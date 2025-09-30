@@ -43,6 +43,7 @@ Route::group(['middleware' => ['auth:sanctum', 'checkAdminRole']], function () {
     Route::resource('products', ProductController::class);
     Route::get('sizes', [SizeController::class, 'index']);
     Route::post('temp-images', [TempImageController::class, 'store']);
+    Route::delete('temp-images/{image}', [TempImageController::class, 'delete']);
     Route::post('save-product-image', [ProductController::class, 'saveProductImage']);
     Route::get('change-product-default-image', [ProductController::class, 'updateDefaultImage']);
     Route::delete('delete-product-image/{id}', [ProductController::class, 'deleteProductImage']);
