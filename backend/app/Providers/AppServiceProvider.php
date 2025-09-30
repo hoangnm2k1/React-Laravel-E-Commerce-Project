@@ -16,11 +16,15 @@ use App\Repositories\OrderRepository;
 use App\Services\Interfaces\IOrderService;
 use App\Services\OrderService;
 use App\Repositories\Interfaces\IProductRepository;
+use App\Repositories\Interfaces\IShippingChargeRepository;
 use App\Repositories\ProductRepository;
+use App\Repositories\ShippingChargeRepository;
 use App\Services\Interfaces\IProductService;
 use App\Services\ProductService;
 use App\Services\Interfaces\IProductImageService;
+use App\Services\Interfaces\IShippingChargeService;
 use App\Services\ProductImageService;
+use App\Services\ShippingChargeService;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -38,6 +42,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(IProductRepository::class, ProductRepository::class);
         $this->app->bind(IProductService::class, ProductService::class);
         $this->app->bind(IProductImageService::class, ProductImageService::class);
+        $this->app->bind(IShippingChargeRepository::class, ShippingChargeRepository::class);
+        $this->app->bind(IShippingChargeService::class, ShippingChargeService::class);
     }
 
     /**

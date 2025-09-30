@@ -3,15 +3,22 @@
 namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\ShippingCharge;
+use App\Services\Interfaces\IShippingChargeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class ShippingChargeController extends Controller
 {
+    protected $shippingChargeService;
+
+    public function __construct(IShippingChargeService $shippingChargeService)
+    {
+        $this->shippingChargeService = $shippingChargeService;
+    }
+
     public function getShipping()
     {
-        $shipping = ShippingCharge::first();
+        $shipping = $this->shippingChargeService->getShipping();
 
         return response()->json([
             'status' => 200,
@@ -32,10 +39,7 @@ class ShippingChargeController extends Controller
             ], 400);
         }
 
-        $shipping = ShippingCharge::updateOrInsert(
-            ['id' => 1],
-            ['shipping_charge' => $request->shipping_charge]
-        );
+        $shipping = $this->shippingChargeService->updateShipping($request->all());
 
         return response()->json([
             'status' => 200,
