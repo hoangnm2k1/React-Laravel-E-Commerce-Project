@@ -45,6 +45,17 @@ DB_CONNECTION=sqlite
 STRIPE_KEY=your_stripe_publishable_key
 STRIPE_SECRET=your_stripe_secret_key
 
+# Email
+
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=your_email@gmail.com
+MAIL_PASSWORD=your_app_password
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS=your_email@gmail.com
+MAIL_FROM_NAME="${APP_NAME}"
+
 🚀 Chạy ứng dụng
 
 Cách nhanh nhất:
@@ -114,4 +125,10 @@ Lấy publishable + secret keys
 
 Thêm vào .env
 
-> > > > > > > 02cdbcb319d16bbf9ad364b5a8dd313f90477fcb
+📧 Email
+
+**Gmail:**
+
+1. Bật 2-Step Verification
+2. Tạo App Password: Google Account → Security → App passwords
+3. Dùng App Password làm MAIL_PASSWORD
