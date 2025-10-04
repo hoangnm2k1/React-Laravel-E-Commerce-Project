@@ -32,6 +32,7 @@ const Register = () => {
             name: result.name,
           };
           localStorage.setItem("userInfo", JSON.stringify(userInfo));
+          toast.success("Registered successfully");
           navigate("/account/login");
         } else {
           toast.error("Failed to register: ");

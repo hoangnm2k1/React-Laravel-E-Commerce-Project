@@ -42,10 +42,10 @@ const Footer = () => {
             <h2 className="mb-3">Get In Touch</h2>
             <ul>
               <li>
-                <a href="tel:070XXXXXXX">070XXXXXXX</a>
+                <a href="tel:19001080">1900-XXXX</a>
               </li>
               <li>
-                <a href="mailto:name@gmail.com">name@gmail.com</a>
+                <a href="mailto:support@gmail.com">support@gmail.com</a>
               </li>
             </ul>
           </div>
