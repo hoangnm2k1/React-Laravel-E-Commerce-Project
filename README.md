@@ -132,3 +132,13 @@ Thêm vào .env
 1. Bật 2-Step Verification
 2. Tạo App Password: Google Account → Security → App passwords
 3. Dùng App Password làm MAIL_PASSWORD
+
+**Order Confirmation Email:**
+cd backend
+run php artisan queue:work
+Email sẽ tự động gửi sau khi user nhấn "Pay Now" và order được tạo thành công. Email chứa:
+
+- Thông tin order (ID, status, payment status)
+- Thông tin khách hàng và địa chỉ giao hàng
+- Danh sách sản phẩm với hình ảnh
+- Tổng tiền chi tiết (subtotal, shipping, grand total)

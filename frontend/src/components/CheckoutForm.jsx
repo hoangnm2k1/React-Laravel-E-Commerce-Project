@@ -79,10 +79,9 @@ const CheckoutForm = () => {
       const result = await response.json();
       if (result.status == 200) {
         console.log("Order saved successfully:", result);
-
-        toast.success(result.message);
         localStorage.removeItem("cart");
         setLoading(false);
+        toast.success("Order successfully! Check your email");
         navigate(`/order/confirmation/${result.order.id}`);
       } else {
         console.error("Order save failed:", result);

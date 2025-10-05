@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\front;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\SendOrderConfirmationEmail;
 use App\Services\Interfaces\IOrderService;
 use Illuminate\Http\Request;
 
@@ -54,6 +55,8 @@ class OrderController extends Controller
             ];
 
             $result = $this->orderService->createOrder($orderData, $request->cart);
+
+            SendOrderConfirmationEmail::dispatch($result['order'], $result['order_items'], $request->email);
 
             return response()->json([
                 'status' => 200,
