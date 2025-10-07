@@ -109,7 +109,7 @@ const Product = ({ placeholder }) => {
       navigate("/account/login");
       return;
     }
-    
+
     const res = await fetch(`${apiUrl}/products/${params.id}/reviews`, {
       method: "POST",
       headers: {
@@ -340,9 +340,6 @@ const Product = ({ placeholder }) => {
                     </div>
                   </div>
                   <div className="mb-3">
-                    <label htmlFor="" className="form-label">
-                      Description
-                    </label>
                     <JoditEditor
                       ref={editor}
                       value={content}

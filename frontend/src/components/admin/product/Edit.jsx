@@ -77,7 +77,7 @@ const Edit = ({ placeholder }) => {
   });
 
   const saveProduct = async (data) => {
-    const formData = { ...data, description: content };
+    const formData = { ...data, description: content, sizes: sizesChecked };
     setDisable(true);
     const res = await fetch(`${apiUrl}/products/${params.id}`, {
       method: "PUT",
@@ -95,9 +95,7 @@ const Edit = ({ placeholder }) => {
           toast.success(result.message);
           navigate("/admin/products");
         } else {
-          Object.keys(result.errors).forEach((key) => {
-            setError(key, { message: result.errors[key][0] });
-          });
+          console.log(result.errors);
         }
       });
   };

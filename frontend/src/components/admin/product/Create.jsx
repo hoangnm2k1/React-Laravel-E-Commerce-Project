@@ -56,9 +56,7 @@ const Create = ({ placeholder }) => {
           toast.success(result.message);
           navigate("/admin/products");
         } else {
-          Object.keys(result.errors).forEach((key) => {
-            setError(key, { message: result.errors[key][0] });
-          });
+          console.log(result.errors);
         }
       });
   };
@@ -128,7 +126,7 @@ const Create = ({ placeholder }) => {
 
   const deleteImage = async (image) => {
     const imageName = image.split("/").pop();
-    console.log('Deleting image:', imageName);
+    console.log("Deleting image:", imageName);
 
     try {
       const response = await fetch(`${apiUrl}/temp-images/${imageName}`, {
@@ -138,25 +136,27 @@ const Create = ({ placeholder }) => {
           Authorization: `Bearer ${adminToken()}`,
         },
       });
-      
+
       const result = await response.json();
-      console.log('Delete response:', result);
-      
+      console.log("Delete response:", result);
+
       if (result.status === 200) {
         const imageIndex = galleryImages.indexOf(image);
         const newGallery = galleryImages.filter((img) => img !== image);
-        const newGalleryIds = gallery.filter((_, index) => index !== imageIndex);
-        
+        const newGalleryIds = gallery.filter(
+          (_, index) => index !== imageIndex
+        );
+
         setGalleryImages(newGallery);
         setGallery(newGalleryIds);
-        toast.success('Image deleted successfully');
+        toast.success("Image deleted successfully");
       } else {
-        console.error('Delete failed:', result);
-        toast.error('Failed to delete image');
+        console.error("Delete failed:", result);
+        toast.error("Failed to delete image");
       }
     } catch (error) {
-      console.error('Delete error:', error);
-      toast.error('Error deleting image');
+      console.error("Delete error:", error);
+      toast.error("Error deleting image");
     }
   };
 
