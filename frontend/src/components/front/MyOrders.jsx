@@ -41,10 +41,7 @@ const MyOrders = () => {
       <div className="container">
         <div className="row">
           <div className="d-flex justify-content-between mt-5 pb-3">
-            <h4 className="h4 pb-0 mb-0">Title</h4>
-            <Link to="" className="btn btn-primary">
-              Button
-            </Link>
+            <h4 className="h4 pb-0 mb-0">My Orders</h4>
           </div>
           <div className="col-md-3">
             <UserSidebar />

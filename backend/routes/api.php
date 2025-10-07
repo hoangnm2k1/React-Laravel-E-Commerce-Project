@@ -11,6 +11,7 @@ use App\Http\Controllers\admin\TempImageController;
 use App\Http\Controllers\front\AccountController;
 use App\Http\Controllers\front\OrderController;
 use App\Http\Controllers\front\ProductController as FrontProductController;
+use App\Http\Controllers\front\ReviewController;
 use App\Http\Controllers\front\ShippingController;
 use App\Models\Order;
 use Illuminate\Support\Facades\Route;
@@ -25,6 +26,7 @@ Route::get('/get-product/{id}', [FrontProductController::class, 'getProductDetai
 Route::post('/register', [AccountController::class, 'register']);
 Route::post('/login', [AccountController::class, 'authenticate']);
 Route::get('/get-shipping-front', [ShippingController::class, 'getShipping']);
+Route::get('/get-reviews/{id}', [ReviewController::class, 'getReviews']);
 
 Route::group(['middleware' => ['auth:sanctum', 'checkUserRole']], function () {
     Route::post('/save-order', [OrderController::class, 'saveOrder']);
@@ -34,6 +36,7 @@ Route::group(['middleware' => ['auth:sanctum', 'checkUserRole']], function () {
     Route::get('/get-profile', [AccountController::class, 'getProfile']);
     Route::post('/update-profile', [AccountController::class, 'updateProfile']);
     Route::post('/create-payment-intent', [OrderController::class, 'createPaymentIntent']);
+    Route::post('/products/{id}/reviews', [ReviewController::class, 'postReviews']);
 });
 
 

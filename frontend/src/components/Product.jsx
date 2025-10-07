@@ -1,7 +1,7 @@
 import React from "react";
 import { useState } from "react";
 import Layout from "./common/Layout";
-import { Link, useParams } from "react-router-dom";
+import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Thumbs, FreeMode, Navigation } from "swiper/modules";
 import { Rating } from "react-simple-star-rating";
@@ -11,28 +11,53 @@ import "swiper/css";
 import "swiper/css/free-mode";
 import "swiper/css/navigation";
 import "swiper/css/thumbs";
-import { apiUrl } from "./common/Http";
+import { apiUrl, userToken } from "./common/Http";
 import { useEffect } from "react";
-import { set } from "react-hook-form";
 import { useContext } from "react";
 import { CartContext } from "./context/CartContext";
 import { toast } from "react-toastify";
+import JoditEditor from "jodit-react";
+import { useMemo } from "react";
+import { useRef } from "react";
+import { set, useForm } from "react-hook-form";
 
-const Product = () => {
+const Product = ({ placeholder }) => {
+  const editor = useRef(null);
+  const [content, setContent] = useState("");
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
   const [rating, setRating] = useState(4);
   const [product, setProduct] = useState(null);
   const [productImages, setProductImages] = useState([]);
   const [productSizes, setProductSizes] = useState([]);
   const [sizeSelected, setSizeSelected] = useState(null);
+  const [reviews, setReviews] = useState([]);
+  const [totalReviews, setTotalReviews] = useState(0);
+  const [avgRating, setAvgRating] = useState(0);
+  const [myRating, setMyRating] = useState(0);
+  const [myComment, setMyComment] = useState("");
+
   const params = useParams();
+  const navigate = useNavigate();
   const { addToCart } = useContext(CartContext);
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors },
+  } = useForm();
+
+  const config = useMemo(
+    () => ({
+      readonly: false,
+      placeholder: placeholder || "Start typings...",
+    }),
+    [placeholder]
+  );
 
   const fetchProductDetails = () => {
     fetch(`${apiUrl}/get-product/${params.id}`)
       .then((res) => res.json())
       .then((result) => {
-        console.log(result);
         if (result.status == 200) {
           setProduct(result.data);
           setProductImages(result.data.product_images);
@@ -65,8 +90,54 @@ const Product = () => {
     }
   };
 
+  const fetchReview = async () => {
+    const res = await fetch(`${apiUrl}/get-reviews/${params.id}`)
+      .then((res) => res.json())
+      .then((result) => {
+        if (result.status == 200) {
+          setReviews(result.reviews);
+          setAvgRating(result.avgRating);
+          setTotalReviews(result.totalReviews);
+        }
+      });
+  };
+
+  const postReview = async (data) => {
+    const token = userToken();
+    if (!token) {
+      toast.error("You must be logged in to post a review");
+      navigate("/account/login");
+      return;
+    }
+    
+    const res = await fetch(`${apiUrl}/products/${params.id}/reviews`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        rating: myRating,
+        comment: content,
+      }),
+    })
+      .then((res) => res.json())
+      .then((result) => {
+        if (result.status == 200) {
+          toast.success("Review submitted successfully");
+          setContent("");
+          setMyRating(0);
+          fetchReview();
+        } else {
+          toast.error("Failed to submit review");
+        }
+      });
+  };
+
   useEffect(() => {
     fetchProductDetails();
+    fetchReview();
   }, []);
 
   return (
@@ -150,8 +221,8 @@ const Product = () => {
             <div className="col-md-7">
               <h2>{product.title}</h2>
               <div className="d-flex">
-                <Rating size={20} readonly initialValue={rating} />
-                <span className="pt-1 ps-2">10 Reviews</span>
+                <Rating size={20} readonly initialValue={avgRating} />
+                <span className="pt-1 ps-2">{totalReviews} Reviews</span>
               </div>
               <div className="price h3 py-3">
                 ${product.price} &nbsp;
@@ -214,8 +285,82 @@ const Product = () => {
                   <p>Ask admin to add description</p>
                 )}
               </Tab>
-              <Tab eventKey="reviews" title="Reviews (10)">
-                Reviews
+              <Tab eventKey="reviews" title={`Reviews (${totalReviews})`}>
+                <div>
+                  {totalReviews === 0 ? (
+                    <p>No reivews yet</p>
+                  ) : (
+                    reviews.map((review, idx) => (
+                      <div key={idx} className="mb-3 border-bottom pb-2">
+                        <div className="d-flex">
+                          <span className="pt-1 me-1">
+                            <strong>{review.user.name}</strong>
+                          </span>
+                          <Rating
+                            size={16}
+                            readonly
+                            initialValue={review.rating}
+                          />
+                        </div>
+                        <div
+                          dangerouslySetInnerHTML={{ __html: review.comment }}
+                        />
+                        <small className="text-muted">
+                          {new Date(review.created_at).toLocaleString()}
+                        </small>
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                <form className="mb-4" onSubmit={handleSubmit(postReview)}>
+                  <div className="mb-2">
+                    <strong>
+                      Your review: <span className="text-danger">*</span>
+                    </strong>
+                    <div>
+                      <input
+                        type="hidden"
+                        {...register("rating", {
+                          required:
+                            "Please select a rating before submitting your review",
+                        })}
+                        value={myRating}
+                      />
+                      <Rating
+                        size={20}
+                        initialValue={myRating}
+                        onClick={setMyRating}
+                      />
+                      {errors.rating && (
+                        <small className="text-danger d-block">
+                          {String(errors.rating.message)}
+                        </small>
+                      )}
+                    </div>
+                  </div>
+                  <div className="mb-3">
+                    <label htmlFor="" className="form-label">
+                      Description
+                    </label>
+                    <JoditEditor
+                      ref={editor}
+                      value={content}
+                      config={config}
+                      tabIndex={1}
+                      onBlur={(newContent) => setContent(newContent)}
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    className={`btn btn-primary ${
+                      myRating === 0 ? "disabled" : ""
+                    }`}
+                    disabled={myRating === 0}
+                  >
+                    Submit Review
+                  </button>
+                </form>
               </Tab>
             </Tabs>
           </div>
